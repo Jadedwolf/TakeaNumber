@@ -1,6 +1,6 @@
 name: TakeaNumber
 main: me.olddragon.takeanumber.TakeaNumber
-version: 0.8
+version: 0.1
 commands:
    tan:
       description: Help Menu

@@ -140,7 +140,7 @@ public class TakeaNumber extends JavaPlugin {
    * @param isAdmin Show the administrator commands
    */
   protected void displayCommands (CommandSender sender, boolean isAdmin) {
-    sender.sendMessage(ChatColor.GOLD + "-- " + ChatColor.WHITE + "TakeaNumber" + " v" + getDescription().getVersion() + ChatColor.GOLD + " --");
+    sender.sendMessage(ChatColor.GOLD + "-- " + ChatColor.WHITE + "Commands" + ChatColor.GOLD + " --");
     sender.sendMessage(ChatColor.BLUE + " /ticket <Description>" + ChatColor.WHITE + " - Open a Help ticket. [Stand @ Location]");
     sender.sendMessage(ChatColor.BLUE + " /tickets" + ChatColor.WHITE + " - View Your Tickets.");
     sender.sendMessage(ChatColor.BLUE + " /checkticket <#>" + ChatColor.WHITE + " - Check one of your ticket's info.");
@@ -201,7 +201,12 @@ public class TakeaNumber extends JavaPlugin {
         } else {
           newTicket(next_ticket, player.getDisplayName());
           ticket.placed_by = player.getDisplayName();
-          ticket.location = String.format("%s,%d,%d,%d", player.getWorld().getName(), player.getLocation().getX(), player.getLocation().getY(), player.getLocation().getZ());
+          ticket.location = String.format("%s,%d,%d,%d",
+            player.getWorld().getName(),
+            (int)player.getLocation().getX(),
+            (int)player.getLocation().getY(),
+            (int)player.getLocation().getZ()
+          );
         }
         
         ticket.save();
