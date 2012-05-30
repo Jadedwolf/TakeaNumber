@@ -1,0 +1,8 @@
+# Take a Number
+# Permisions:
+# tan.ticket - Create help tickets
+# tan.admin - Administrate tickets
+# 
+ShowTicketsOnJoin: true
+NotifyAdminOnTicketClose: true
+MaxTickets: 3
