@@ -7,3 +7,4 @@ ShowTicketsOnJoin: true
 NotifyAdminOnTicketClose: true
 MaxTickets: 3
 DateFormat: "dd/MMM/yy HH:mm"
+AlwaysLoadTickets: true

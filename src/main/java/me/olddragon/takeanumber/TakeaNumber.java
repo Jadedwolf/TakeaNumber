@@ -166,7 +166,7 @@ public class TakeaNumber extends JavaPlugin {
     
     if (getConfig().getBoolean("AlwaysLoadTickets", false)) { loadTickets(); }
 
-    if(cmd.getName().equalsIgnoreCase("tickethelp")){ 
+    if(cmd.getName().equalsIgnoreCase("tan")){ 
       displayCommands(sender, isAdmin);
     }
 
