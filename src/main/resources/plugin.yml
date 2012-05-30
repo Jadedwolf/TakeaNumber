@@ -1,5 +1,5 @@
 name: TakeaNumber
-main: me.olddragon.takeanumber
+main: me.olddragon.takeanumber.TakeaNumber
 version: 0.8
 commands:
    helptickets:

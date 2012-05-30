@@ -8,14 +8,12 @@ import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.FileConfigurationOptions;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -34,29 +32,19 @@ public class TakeaNumber extends JavaPlugin {
   private YamlConfiguration tickets_config = null;
   private File tickets_file = null;
   
+  @SuppressWarnings("unused")
   private PListener listener = null;
-  
-  public TakeaNumber () {
-    if (date_format == null) {
-      String format = getConfig().getString("DateFormat");
-      try {
-        date_format = new SimpleDateFormat(format);
-      } catch (IllegalArgumentException ex) {
-        Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, "Invalid date format: " + format, ex);
-        date_format = new SimpleDateFormat();
-      }
-    }
-  }
   
   public static String getCurrentDate () { return date_format.format (Calendar.getInstance().getTime()); }
   
+  public void loadTickets() {
+    if (tickets_file == null) { tickets_file = new File(getDataFolder(), "Tickets.yml"); }
+    tickets_config = YamlConfiguration.loadConfiguration(tickets_file);
+    InputStream defaults = getResource("Tickets.yml");
+    if (defaults != null) { tickets_config.setDefaults(YamlConfiguration.loadConfiguration(defaults)); }
+  }
   public YamlConfiguration getTickets() {
-    if (tickets_config == null) { 
-      if (tickets_file == null) { tickets_file = new File(getDataFolder(), "Tickets.yml"); }
-      tickets_config = YamlConfiguration.loadConfiguration(tickets_file);
-      InputStream defaults = getResource("Tickets.yml");
-      if (defaults != null) { tickets_config.setDefaults(YamlConfiguration.loadConfiguration(defaults)); }
-    }
+    if (tickets_config == null) { loadTickets(); }
     return tickets_config;
   }
   public void saveTickets() {
@@ -75,7 +63,17 @@ public class TakeaNumber extends JavaPlugin {
     cfgOptions.copyDefaults(true);
     cfgOptions.copyHeader(true);
     saveConfig();
-    
+
+    if (date_format == null) {
+      String format = getConfig().getString("DateFormat");
+      try {
+        date_format = new SimpleDateFormat(format);
+      } catch (IllegalArgumentException ex) {
+        Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, "Invalid date format: " + format, ex);
+        date_format = new SimpleDateFormat();
+      }
+    }
+
     // Load Tickets
     FileConfigurationOptions ticketOptions = getTickets().options();
     ticketOptions.copyDefaults(true);
@@ -105,6 +103,7 @@ public class TakeaNumber extends JavaPlugin {
       if (getConfig().getBoolean("ShowTicketsOnJoin") == true) {
         Player player = event.getPlayer();
         if (player != null && player.hasPermission("tan.admin")) {
+          if (getConfig().getBoolean("AlwaysLoadTickets", false)) { loadTickets(); }
           int ticklength = getTickets().getStringList("Tickets").size();
           if(ticklength > 0) {
             player.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "There are currently " + ChatColor.GOLD + ticklength + ChatColor.GRAY + " open Help Tickets");
@@ -164,6 +163,8 @@ public class TakeaNumber extends JavaPlugin {
     }
     boolean isConsole = player == null;
     boolean isAdmin = player == null || player.hasPermission("tan.admin");
+    
+    if (getConfig().getBoolean("AlwaysLoadTickets", false)) { loadTickets(); }
 
     if(cmd.getName().equalsIgnoreCase("tickethelp")){ 
       displayCommands(sender, isAdmin);
