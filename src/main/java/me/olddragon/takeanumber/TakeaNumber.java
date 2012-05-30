@@ -27,83 +27,68 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class TakeaNumber extends JavaPlugin {
-
-    /**
-     * @return the ticket_format
-     */
-    public static java.util.regex.Pattern getTicket_format() {
-        return ticket_format;
-    }
-
-    /**
-     * @param aTicket_format the ticket_format to set
-     */
-    public static void setTicket_format(java.util.regex.Pattern aTicket_format) {
-        ticket_format = aTicket_format;
-    }
-  static final Logger log = Logger.getLogger("Minecraft");
-
-  // Custom Config  
-  private FileConfiguration StorageConfig = null;
-  private File StorageConfigFile = null;
-
-  public void reloadStorageConfig() {
-    if (StorageConfigFile == null) {
-      StorageConfigFile = new File(getDataFolder(), "StorageConfig.yml");
-    }
-    StorageConfig = YamlConfiguration.loadConfiguration(StorageConfigFile);
-
-    // Look for defaults in the jar
-    InputStream defConfigStream = getResource("StorageConfig.yml");
-    if (defConfigStream != null) {
-      YamlConfiguration defConfig = YamlConfiguration.loadConfiguration(defConfigStream);
-      StorageConfig.setDefaults(defConfig);
-    }
-  }
-  public FileConfiguration getStorageConfig() {
-    if (StorageConfig == null) {
-      reloadStorageConfig();
-    }
-    return StorageConfig;
-  }
-  public void saveStorageConfig() {
-    if (StorageConfig == null || StorageConfigFile == null) { return; }
-    try {
-      StorageConfig.save(StorageConfigFile);
-    } catch (IOException ex) {
-      Logger.getLogger(JavaPlugin.class.getName()).log(Level.SEVERE, "Could not save config to " + StorageConfigFile, ex);
-    }
-  }
-  // End Custom Config
-
-  public static SimpleDateFormat date_format = new SimpleDateFormat ("dd/MMM/yy HH:mm");
-  public static String getCurrentDTG () {
-    Calendar currentDate = Calendar.getInstance();    
-    return date_format.format (currentDate.getTime());
-  }  
-
-    @Override
-  public void onEnable(){    
-    log.info("[" + getDescription().getName() + "] " + getDescription().getVersion() + " enabled.");
     
-    FileConfiguration cfg = getConfig();
-    FileConfigurationOptions cfgOptions = cfg.options();
+  static final Logger log = Logger.getLogger("Minecraft");
+  public static SimpleDateFormat date_format = null;
+  
+  private YamlConfiguration tickets_config = null;
+  private File tickets_file = null;
+  
+  private PListener listener = null;
+  
+  public TakeaNumber () {
+    if (date_format == null) {
+      String format = getConfig().getString("DateFormat");
+      try {
+        date_format = new SimpleDateFormat(format);
+      } catch (IllegalArgumentException ex) {
+        Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, "Invalid date format: " + format, ex);
+        date_format = new SimpleDateFormat();
+      }
+    }
+  }
+  
+  public static String getCurrentDate () { return date_format.format (Calendar.getInstance().getTime()); }
+  
+  public YamlConfiguration getTickets() {
+    if (tickets_config == null) { 
+      if (tickets_file == null) { tickets_file = new File(getDataFolder(), "Tickets.yml"); }
+      tickets_config = YamlConfiguration.loadConfiguration(tickets_file);
+      InputStream defaults = getResource("Tickets.yml");
+      if (defaults != null) { tickets_config.setDefaults(YamlConfiguration.loadConfiguration(defaults)); }
+    }
+    return tickets_config;
+  }
+  public void saveTickets() {
+    if (tickets_config == null || tickets_file == null) { return; }
+    try {
+      tickets_config.save(tickets_file);
+    } catch (IOException ex) {
+      Logger.getLogger(JavaPlugin.class.getName()).log(Level.SEVERE, "Could not save config to " + tickets_file.toString(), ex);
+    }
+  }
+
+  @Override
+  public void onEnable(){
+    // Load configuration
+    FileConfigurationOptions cfgOptions = getConfig().options();
     cfgOptions.copyDefaults(true);
     cfgOptions.copyHeader(true);
     saveConfig();
     
-    // Load Custom Config
-    FileConfiguration ccfg = getStorageConfig();
-    FileConfigurationOptions ccfgOptions = ccfg.options();
-    ccfgOptions.copyDefaults(true);
-    ccfgOptions.copyHeader(true);
-    saveStorageConfig();
+    // Load Tickets
+    FileConfigurationOptions ticketOptions = getTickets().options();
+    ticketOptions.copyDefaults(true);
+    ticketOptions.copyHeader(true);
+    saveTickets();
 
     // declare new listener
-    new PListener(this);
+    this.listener = new PListener(this);
+    
+    log.log(Level.INFO, "[{0}] {1} enabled.", new Object[]{ getDescription().getName(), getDescription().getVersion() }); 
   }
 
-    @Override
+  @Override
   public void onDisable(){ 
     log.log(Level.INFO, "[{0}] {1} disabled.", new Object[]{getDescription().getName(), getDescription().getVersion()}); 
   }
@@ -120,7 +105,7 @@ public class TakeaNumber extends JavaPlugin {
       if (getConfig().getBoolean("ShowTicketsOnJoin") == true) {
         Player player = event.getPlayer();
         if (player != null && player.hasPermission("tan.admin")) {
-          int ticklength = getStorageConfig().getStringList("Tickets").size();
+          int ticklength = getTickets().getStringList("Tickets").size();
           if(ticklength > 0) {
             player.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "There are currently " + ChatColor.GOLD + ticklength + ChatColor.GRAY + " open Help Tickets");
           }
@@ -171,7 +156,7 @@ public class TakeaNumber extends JavaPlugin {
     }
   }
 
-    @Override
+  @Override
   public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
     Player player = null;
     if (sender instanceof Player) {
@@ -179,7 +164,6 @@ public class TakeaNumber extends JavaPlugin {
     }
     boolean isConsole = player == null;
     boolean isAdmin = player == null || player.hasPermission("tan.admin");
-    boolean canReload = player != null && player.hasPermission("tan.reload");
 
     if(cmd.getName().equalsIgnoreCase("tickethelp")){ 
       displayCommands(sender, isAdmin);
@@ -190,8 +174,8 @@ public class TakeaNumber extends JavaPlugin {
         displayCommands(sender, isAdmin);
       } else {
         
-        if (player != null && getStorageConfig().getString(player.getDisplayName()) != null ) {
-          int count = getStorageConfig().getInt(player.getDisplayName());
+        if (player != null && getTickets().getString(player.getDisplayName()) != null ) {
+          int count = getTickets().getInt(player.getDisplayName());
           int MaxTickets = getConfig().getInt("MaxTickets");
           if (count >= MaxTickets) {
             sender.sendMessage(ChatColor.RED + "You've reached your limit of " + MaxTickets + " tickets.");
@@ -199,23 +183,20 @@ public class TakeaNumber extends JavaPlugin {
           }
         }
         
-        java.util.List<String> tickets = getStorageConfig().getStringList("Tickets");
-        String next_ticket = String.valueOf(tickets.isEmpty() ? 0 : Integer.parseInt(Ticket.load(getStorageConfig(), tickets.get(tickets.size() - 1)).getId(), 10) + 1);
-        Ticket ticket = new Ticket(getStorageConfig(), next_ticket);
+        java.util.List<String> tickets = getTickets().getStringList("Tickets");
+        String next_ticket = String.valueOf(tickets.isEmpty() ? 0 : Integer.parseInt(Ticket.load(getTickets(), tickets.get(tickets.size() - 1)).getId(), 10) + 1);
+        Ticket ticket = new Ticket(getTickets(), next_ticket);
 
         StringBuilder details = new StringBuilder();
         for (int i=0; i<args.length; i++) { details.append(args[i]).append(" "); }
 
         ticket.description = details.toString();
-        ticket.dates = getCurrentDTG();
-        ticket.reply = "none";
-        ticket.admin = "none";
+        ticket.dates = getCurrentDate();
         
         // CONSOLE COMMANDS
         if (isConsole) {
           newTicket(next_ticket, "Console");
           ticket.placed_by = "Console";
-          ticket.location = "none";
         } else {
           newTicket(next_ticket, player.getDisplayName());
           ticket.placed_by = player.getDisplayName();
@@ -223,7 +204,7 @@ public class TakeaNumber extends JavaPlugin {
         }
         
         ticket.save();
-        saveStorageConfig();
+        saveTickets();
         
         sender.sendMessage(
             ChatColor.GREEN + "Your ticket (#" + ChatColor.RED + ticket.getId() + ChatColor.GREEN + ") has been logged and will be reviewed shortly." +
@@ -233,14 +214,14 @@ public class TakeaNumber extends JavaPlugin {
     }
 
     if(cmd.getName().equalsIgnoreCase("tickets")){
-      java.util.List<String> Tickets = getStorageConfig().getStringList("Tickets");
+      java.util.List<String> Tickets = getTickets().getStringList("Tickets");
       if (Tickets.isEmpty()) {
         sender.sendMessage(ChatColor.WHITE + " There are currently no help tickets to display.");  
       } else {
         sender.sendMessage(ChatColor.GOLD + "-- " + ChatColor.WHITE + "Current Help Tickets" + ChatColor.GOLD + " --");
         String name = player == null ? null : player.getDisplayName();
         for (String id : Tickets) {
-          Ticket ticket = Ticket.load(getStorageConfig(), id);
+          Ticket ticket = Ticket.load(getTickets(), id);
           if (ticket != null && (isAdmin || name != null && ticket.placed_by.contains(name))) {
             ChatColor color = !ticket.reply.equalsIgnoreCase("none") ? ChatColor.YELLOW : ChatColor.WHITE;
             sender.sendMessage(ChatColor.GOLD + " (" + color + ticket.getId() + ChatColor.GOLD + ") " + ChatColor.BLUE + ticket.placed_by + color + ": " + ticket.description);
@@ -254,7 +235,7 @@ public class TakeaNumber extends JavaPlugin {
     if(cmd.getName().equalsIgnoreCase("checkticket")){
       if (! isTicket(args[0])) { sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + args[0]); return true; }
       String id = args[0];
-      Ticket ticket = Ticket.load(getStorageConfig(), id);
+      Ticket ticket = Ticket.load(getTickets(), id);
       
       if (ticket == null) {
         sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
@@ -270,14 +251,19 @@ public class TakeaNumber extends JavaPlugin {
     if(cmd.getName().equalsIgnoreCase("replyticket")){      
       if (! isTicket(args[0])) { sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + args[0]); return true; }
       String id = args[0];
-      Ticket ticket = Ticket.load(getStorageConfig(), id);
+      Ticket ticket = Ticket.load(getTickets(), id);
+      
+      if (ticket == null) {
+        sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+        return true;
+      }
       
       StringBuilder details = new StringBuilder();
       for (int i=1; i<args.length; i++) { details.append(args[i]).append(" "); }
       
       ticket.reply = player == null ? "(Console) " + details.toString() : "(" + player.getDisplayName() + ") " + details.toString();
       ticket.save();
-      saveStorageConfig();
+      saveTickets();
       
       sender.sendMessage(ChatColor.GOLD + "* " + ChatColor.WHITE + " Replied to ticket " + ChatColor.GOLD + id + ChatColor.WHITE + ".");
       
@@ -294,16 +280,16 @@ public class TakeaNumber extends JavaPlugin {
       if (player == null) { sender.sendMessage("This command can only be run by a player, use /checkticket instead."); return true; }
       if (! isTicket(args[0])) { sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + args[0]); return true; }
       String id = args[0];
-      Ticket ticket = Ticket.load(getStorageConfig(), id);
+      Ticket ticket = Ticket.load(getTickets(), id);
 
       if (ticket == null) {
-        sender.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "Ticket " + ChatColor.GOLD + id + ChatColor.GRAY + " Does Not Exist");
+        sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
         return true;
       }
       
       ticket.admin = player.getDisplayName();
       ticket.save();
-      saveStorageConfig();
+      saveTickets();
       
       ticket.toMessage(sender);
       
@@ -333,8 +319,13 @@ public class TakeaNumber extends JavaPlugin {
       } else if(args.length == 1) {
         String id = args[0];
         if (! isTicket(id)) { sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return true; }
+        Ticket ticket = Ticket.load(getTickets(), id);
+        if (ticket == null) {
+          sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+          return true;
+        }
 
-        String placedby =  Ticket.load(getStorageConfig(), id).placed_by;
+        String placedby =  ticket.placed_by;
         if (player != null && placedby.contains(player.getDisplayName())) {
           closeTicket(id);
           sender.sendMessage(ChatColor.GREEN + " Ticket " + id + " closed.");
@@ -367,10 +358,10 @@ public class TakeaNumber extends JavaPlugin {
    * @param user
    */
   protected void newTicket (String id, String user) {
-    java.util.List<String> Tickets = getStorageConfig().getStringList("Tickets");
+    java.util.List<String> Tickets = getTickets().getStringList("Tickets");
     Tickets.add(id); 
-    getStorageConfig().set("Tickets", Tickets);
-    getStorageConfig().set("counts."+user, getStorageConfig().getInt("counts."+user) + 1);
+    getTickets().set("Tickets", Tickets);
+    getTickets().set("counts."+user, getTickets().getInt("counts."+user) + 1);
   }
   
   /**
@@ -378,16 +369,16 @@ public class TakeaNumber extends JavaPlugin {
    * @param ticket
    */
   protected void closeTicket (String ticket) {
-    String user = Ticket.load(getStorageConfig(), ticket).placed_by;
-    int count = getStorageConfig().getInt("counts."+user) - 1;
-    getStorageConfig().set("counts."+user, count == 0 ? null : count);
+    String user = Ticket.load(getTickets(), ticket).placed_by;
+    int count = getTickets().getInt("counts."+user) - 1;
+    getTickets().set("counts."+user, count == 0 ? null : count);
 
-    java.util.List<String> Tickets = getStorageConfig().getStringList("Tickets");
+    java.util.List<String> Tickets = getTickets().getStringList("Tickets");
     Tickets.remove(ticket);
-    getStorageConfig().set("Tickets", Tickets);
-    getStorageConfig().set(ticket, null);
+    getTickets().set("Tickets", Tickets);
+    getTickets().set(ticket, null);
 
-    saveStorageConfig();
+    saveTickets();
   }
   
   /**
@@ -401,7 +392,7 @@ public class TakeaNumber extends JavaPlugin {
    * @return true if the string matches the ticket format
    */
   protected boolean isTicket (String str) {
-    return getTicket_format().matcher(str).matches();
+    return ticket_format.matcher(str).matches();
   }
   
   /**

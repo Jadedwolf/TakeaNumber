@@ -1,8 +1,9 @@
 # Take a Number
-# Permisions:
+# Permissions:
 # tan.ticket - Create help tickets
 # tan.admin - Administrate tickets
 # 
 ShowTicketsOnJoin: true
 NotifyAdminOnTicketClose: true
 MaxTickets: 3
+DateFormat: "dd/MMM/yy HH:mm"
