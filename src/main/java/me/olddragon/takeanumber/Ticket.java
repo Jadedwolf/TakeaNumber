@@ -14,6 +14,7 @@ public class Ticket {
   public String location;
   public String reply;
   public String admin;
+  public String resolve;
   
   private YamlConfiguration source;
 
@@ -35,6 +36,7 @@ public class Ticket {
     ticket.location    = file.getString(id+".location", "none");
     ticket.reply       = file.getString(id+".reply", "none");
     ticket.admin       = file.getString(id+".admin", "none");
+    ticket.resolve     = file.getString(id+".resolve", "none");
     return ticket;
   }
   
@@ -45,6 +47,7 @@ public class Ticket {
     this.source.set(this.id+".location",    this.location);
     this.source.set(this.id+".reply",       this.reply);
     this.source.set(this.id+".admin",       this.admin);
+    this.source.set(this.id+".resolve",     this.resolve);
   }
   
   public void toMessage (CommandSender sender) {
@@ -54,7 +57,8 @@ public class Ticket {
     sender.sendMessage(" " + ChatColor.BLUE + "Location: " + ChatColor.RED + (this.location.equalsIgnoreCase("none") ? "None [Console Ticket]" : this.location));
     sender.sendMessage(" " + ChatColor.BLUE + "Assigned Admin: " + ChatColor.WHITE + this.admin);
     sender.sendMessage(" " + ChatColor.BLUE + "Ticket: " + ChatColor.GREEN + this.description);
-    sender.sendMessage(" " + ChatColor.BLUE + "Reply: " + ChatColor.YELLOW + this.reply);  
+    sender.sendMessage(" " + ChatColor.BLUE + "Reply: " + ChatColor.YELLOW + this.reply);
+    sender.sendMessage(" " + ChatColor.BLUE + "Resolve: " + ChatColor.YELLOW + this.resolve);
   }
 
   public String getId() { return id; }
