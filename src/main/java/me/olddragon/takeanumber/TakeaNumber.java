@@ -316,7 +316,7 @@ public class TakeaNumber extends JavaPlugin {
 
     if (ticket == null) {
       state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
-    } else if (!state.isAdmin && !ticket.placed_by.contains(state.player.getDisplayName())) {
+    } else if (!state.isAdmin && !ticket.placed_by.equals(state.name)) {
       state.sender.sendMessage("This is not your ticket to check");
     } else {
       ticket.toMessage(state.sender);
