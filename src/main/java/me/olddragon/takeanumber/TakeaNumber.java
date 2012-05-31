@@ -393,7 +393,7 @@ public class TakeaNumber extends JavaPlugin {
           state.sender.sendMessage(
             ChatColor.GOLD + " (" + color + ticket.getId() + ChatColor.GOLD + ") " +
             ChatColor.BLUE + ticket.placed_by + ": " + color + ticket.description +
-            (! ticket.location.equals("none") ? "" : " @ " + ticket.location)
+            (ticket.location.equals("none") ? "" : " @ " + ticket.location)
           );
         }
       }
