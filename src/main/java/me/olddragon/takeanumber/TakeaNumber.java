@@ -189,7 +189,7 @@ public class TakeaNumber extends JavaPlugin {
         else if (command.equals("reply")  && args.length >  2) { cmdReply(state, args);  }
         else if (command.equals("close")  && args.length >= 1) { cmdClose(state, args);  }
         else if (command.equals("delete") && args.length == 1) { cmdDelete(state, args); }
-        else { return false; }
+        else { usage(state); }
       }
     }
 
