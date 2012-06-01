@@ -471,8 +471,10 @@ public class TakeaNumber extends JavaPlugin {
     for (String id : Tickets) {
       try {
         Ticket ticket = Ticket.load(getTickets(), id);
-        Date resolved_on = date_format.parse(ticket.resolved_on);
-        if (resolved_on.before(expiration)) { deleteTicket(id); }
+        if (ticket.resolved_on != null) {
+          Date resolved_on = date_format.parse(ticket.resolved_on);
+          if (resolved_on.before(expiration)) { deleteTicket(id); }
+        }
       } catch (ParseException e) {
         log.log(Level.WARNING, "Error reading resolved on date for ticket - %s", new Object[] { e.getLocalizedMessage() });
       }
