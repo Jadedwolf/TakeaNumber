@@ -2,32 +2,28 @@ name: TakeaNumber
 main: me.olddragon.takeanumber.TakeaNumber
 version: 0.1
 commands:
-   tan:
+   ticket-help:
       description: Help Menu
       aliases: [tickethelp]
       permission:
-      usage: /tan
-   ticket:
+      usage: /<command>
+   ticket-open:
       description: Open a help ticket
       permission: tan.ticket
-      usage: /ticket <Description>
-   tickets:
+      usage: /<command> <Description>
+   ticket-list:
       description: review help tickets
       permission:
-      usage: /tickets   
-   closeticket:
+      usage: /<command>   
+   ticket-check:
       description: close a help ticket
       permission:
-      usage: /closeticket <#>
-   replyticket:
+      usage: /<command> <#>
+   ticket-reply:
       description: reply to a help ticket
       permission: tan.admin
-      usage: /replyticket <#> <reply>
-   taketicket:
+      usage: /<command> <#> <reply>
+   ticket-take:
       description: review a help ticket
       permission: tan.admin
-      usage: /taketicket <#>
-   checkticket:
-      description: check your own help ticket
-      permission:
-      usage: /checkticket <#>
+      usage: /<command> <#>

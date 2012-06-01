@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -148,6 +149,12 @@ public class TakeaNumber extends JavaPlugin {
    * @param isAdmin Show the administrator commands
    */
   protected void usage (State state) {
+    List<String> commands = getConfig().getStringList("commands");
+    for (String command : commands) {
+      Command cmd = getCommand(command);
+      state.sender.sendMessage(ChatColor.BLUE + cmd.getUsage());
+    }
+    /*
     state.sender.sendMessage(ChatColor.GOLD + "-- " + ChatColor.WHITE + "Commands" + ChatColor.GOLD + " --");
     state.sender.sendMessage(ChatColor.BLUE + " /ticket open <Description> " + ChatColor.WHITE + " - Open a ticket. Your current location will be recorded.");
     state.sender.sendMessage(ChatColor.BLUE + " /ticket list               " + ChatColor.WHITE + " - View your tickets.");
@@ -165,11 +172,12 @@ public class TakeaNumber extends JavaPlugin {
       state.sender.sendMessage(ChatColor.RED + " /ticket close <#> [message]" + ChatColor.WHITE + " - Close a ticket.");
       state.sender.sendMessage(ChatColor.RED + " /ticket delete <#>         " + ChatColor.WHITE + " - Delete a ticket.");
     }
+    */
   }
 
   @Override
   public boolean onCommand (CommandSender sender, Command cmd, String label, String[] args) {
-    String command = cmd.getName();
+    String command = cmd.getName().toLowerCase();
 
     State state = new State();
     state.sender = sender;
@@ -180,22 +188,16 @@ public class TakeaNumber extends JavaPlugin {
 
     if (getConfig().getBoolean("AlwaysLoadTickets", false)) { loadTickets(); }
 
-    if (command.equalsIgnoreCase("ticket")) {
-      if (args.length == 0) {
-        usage(state);
-      } else {
-        command = args[0].toLowerCase();
-        if      (command.equals("list")   && args.length == 1) { cmdList(state, args);   }
-        else if (command.equals("open")   && args.length >  1) { cmdOpen(state, args);   }
-        else if (command.equals("check")  && args.length == 2) { cmdCheck(state, args);  }
-        else if (command.equals("take")   && args.length == 2) { cmdTake(state, args);   }
-        else if (command.equals("visit")  && args.length == 2) { cmdVisit(state, args);  }
-        else if (command.equals("reply")  && args.length >  2) { cmdReply(state, args);  }
-        else if (command.equals("close")  && args.length >= 1) { cmdClose(state, args);  }
-        else if (command.equals("delete") && args.length == 1) { cmdDelete(state, args); }
-        else { usage(state); }
-      }
-    }
+    if      (command.equals("ticket-help")   && args.length == 0) { usage(state);           }
+    else if (command.equals("ticket-list")   && args.length == 0) { cmdList(state, args);   }
+    else if (command.equals("ticket-open")   && args.length >  0) { cmdOpen(state, args);   }
+    else if (command.equals("ticket-check")  && args.length == 1) { cmdCheck(state, args);  }
+    else if (command.equals("ticket-take")   && args.length == 1) { cmdTake(state, args);   }
+    else if (command.equals("ticket-visit")  && args.length == 1) { cmdVisit(state, args);  }
+    else if (command.equals("ticket-reply")  && args.length >  1) { cmdReply(state, args);  }
+    else if (command.equals("ticket-close")                     ) { cmdClose(state, args);  }
+    else if (command.equals("ticket-delete") && args.length == 0) { cmdDelete(state, args); }
+    else { usage(state); }
 
     return true;
   }
