@@ -208,7 +208,7 @@ public class TakeaNumber extends JavaPlugin {
    * @param args
    */
   private void cmdDelete(State state, String[] args) {
-    String id = args[1];
+    String id = args[0];
     if (! isTicket(id)) { state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
@@ -234,7 +234,7 @@ public class TakeaNumber extends JavaPlugin {
    * @param args
    */
   private void cmdClose(State state, String[] args) {
-    String id = args[1];
+    String id = args[0];
     if (! isTicket(id)) { state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
@@ -242,8 +242,8 @@ public class TakeaNumber extends JavaPlugin {
     
     StringBuilder resolve = new StringBuilder();
     resolve.append("(").append(TakeaNumber.getCurrentDate()).append(") ");
-    if (args.length > 2) {
-      for (int i=2; i<args.length; i++) { resolve.append(args[i]).append(" "); }
+    if (args.length > 1) {
+      for (int i=1; i<args.length; i++) { resolve.append(args[i]).append(" "); }
     } else {
       resolve.append("resolved");
     }
@@ -270,7 +270,7 @@ public class TakeaNumber extends JavaPlugin {
    */
   private void cmdTake(State state, String[] args) {
     if (! state.isAdmin) { state.player.sendMessage("This command can only be run by an admin, use '/ticket check' instead."); return; }
-    String id = args[1];
+    String id = args[0];
     if (! isTicket(id)) { state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
@@ -291,14 +291,14 @@ public class TakeaNumber extends JavaPlugin {
    * @param args
    */
   private void cmdReply(State state, String[] args) {
-    String id = args[1];
+    String id = args[0];
     if (! isTicket(id)) { state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     if (!state.isAdmin && !ticket.placed_by.equals(state.name)) { state.sender.sendMessage("This is not one of your tickets"); return; }
     
     StringBuilder message = new StringBuilder();
-    for (int i=2; i<args.length; i++) { message.append(args[i]).append(" "); }
+    for (int i=1; i<args.length; i++) { message.append(args[i]).append(" "); }
 
     ticket.reply = (state.isConsole ? "(Console) " : "(" + state.name + ") ") + message.toString();
     ticket.save();
@@ -316,7 +316,7 @@ public class TakeaNumber extends JavaPlugin {
    * @param args
    */
   private void cmdCheck(State state, String[] args) {
-    String id = args[1];
+    String id = args[0];
     if (! isTicket(id)) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     Ticket ticket = Ticket.load(getTickets(), id);
 
@@ -349,7 +349,7 @@ public class TakeaNumber extends JavaPlugin {
     Ticket ticket = new Ticket(getTickets(), next_ticket);
 
     StringBuilder message = new StringBuilder();
-    for (int i=1; i<args.length; i++) { message.append(args[i]).append(" "); }
+    for (int i=0; i<args.length; i++) { message.append(args[i]).append(" "); }
 
     ticket.description = message.toString();
     ticket.dates = getCurrentDate();
@@ -416,7 +416,7 @@ public class TakeaNumber extends JavaPlugin {
    */
   private void cmdVisit(State state, String[] args) {
     if (! state.isAdmin) { state.player.sendMessage("This command can only be run by an admin, use '/ticket check' instead."); return; }
-    String id = args[1];
+    String id = args[0];
     if (! isTicket(id)) { state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
