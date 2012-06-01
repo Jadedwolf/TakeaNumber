@@ -362,7 +362,6 @@ public class TakeaNumber extends JavaPlugin {
     if (!state.isAdmin && !ticket.placed_by.equals(state.name)) { state.sender.sendMessage("This is not one of your tickets"); return; }
     
     StringBuilder resolve = new StringBuilder();
-    resolve.append("(").append(TakeaNumber.getCurrentDate()).append(") ");
     if (args.length > 1) {
       for (int i=1; i<args.length; i++) { resolve.append(args[i]).append(" "); }
     } else {
