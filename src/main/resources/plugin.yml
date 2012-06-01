@@ -9,10 +9,12 @@ commands:
       usage: /<command>
    ticket-open:
       description: Open a help ticket
+      aliases: [ticket, report]
       permission: tan.ticket
       usage: /<command> <Description>
    ticket-list:
       description: review help tickets
+      aliases: [tickets]
       permission:
       usage: /<command>   
    ticket-check:
@@ -25,5 +27,9 @@ commands:
       usage: /<command> <#> <reply>
    ticket-take:
       description: review a help ticket
+      permission: tan.admin
+      usage: /<command> <#>
+   ticket-resolve:
+      description: resolve a help ticket
       permission: tan.admin
       usage: /<command> <#>
