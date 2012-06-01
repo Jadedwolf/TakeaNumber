@@ -55,14 +55,14 @@ public class Ticket {
   
   public void toMessage (CommandSender sender) {
     sender.sendMessage(ChatColor.GOLD + "-- " + ChatColor.WHITE + "Ticket " + this.id + ChatColor.GOLD + " --");
-    sender.sendMessage(" " + ChatColor.BLUE + "Placed By:   " + ChatColor.WHITE + this.placed_by);
-    sender.sendMessage(" " + ChatColor.BLUE + "Date:        " + ChatColor.WHITE + this.dates);
-    sender.sendMessage(" " + ChatColor.BLUE + "Location:    " + ChatColor.WHITE + (this.location.equalsIgnoreCase("none") ? "None [Console Ticket]" : this.location));
-    sender.sendMessage(" " + ChatColor.BLUE + "Assigned:    " + ChatColor.WHITE + this.admin);
-    sender.sendMessage(" " + ChatColor.BLUE + "Ticket:      " + ChatColor.GREEN + this.description);
-    sender.sendMessage(" " + ChatColor.BLUE + "Reply:       " + ChatColor.YELLOW + this.reply);
-    sender.sendMessage(" " + ChatColor.BLUE + "Resolve:     " + ChatColor.YELLOW + this.resolve);
-    sender.sendMessage(" " + ChatColor.BLUE + "Resolved On: " + ChatColor.YELLOW + this.resolved_on);
+    sender.sendMessage(" " + ChatColor.BLUE + "Ticket: " + ChatColor.RED + this.description);
+    sender.sendMessage(" " + ChatColor.BLUE + "Date: " + ChatColor.WHITE + this.dates);
+    sender.sendMessage(" " + ChatColor.BLUE + "Location: " + ChatColor.WHITE + (this.location.equalsIgnoreCase("none") ? "None [Console Ticket]" : this.location));
+    sender.sendMessage(" " + ChatColor.BLUE + "Placed By: " + ChatColor.WHITE + this.placed_by);
+    sender.sendMessage(" " + ChatColor.BLUE + "Assigned: " + ChatColor.WHITE + this.admin);
+    if (!this.reply.equals("none")) { sender.sendMessage(" " + ChatColor.BLUE + "Reply: " + ChatColor.YELLOW + this.reply); }
+    if (!this.resolve.equals("none")) { sender.sendMessage(" " + ChatColor.BLUE + "Resolve: " + ChatColor.GREEN + this.resolve); }
+    if (this.resolved_on != null) { sender.sendMessage(" " + ChatColor.BLUE + "Resolved On: " + ChatColor.GREEN + this.resolved_on); }
   }
 
   public String getId() { return id; }
