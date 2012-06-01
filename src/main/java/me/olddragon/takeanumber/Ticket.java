@@ -15,6 +15,7 @@ public class Ticket {
   public String reply;
   public String admin;
   public String resolve;
+  public String resolved_on;
   
   private YamlConfiguration source;
 
@@ -30,13 +31,14 @@ public class Ticket {
   public static Ticket load (YamlConfiguration file, String id) {
     if (!exists(file, id)) { return null; }
     Ticket ticket = new Ticket(file, id);
-    ticket.description = file.getString(id+".description");
-    ticket.dates       = file.getString(id+".dates");
-    ticket.placed_by   = file.getString(id+".placedby");
-    ticket.location    = file.getString(id+".location", "none");
-    ticket.reply       = file.getString(id+".reply", "none");
-    ticket.admin       = file.getString(id+".admin", "none");
-    ticket.resolve     = file.getString(id+".resolve", "none");
+    ticket.description = file.getString(id+".description"        );
+    ticket.dates       = file.getString(id+".dates"              );
+    ticket.placed_by   = file.getString(id+".placedby"           );
+    ticket.location    = file.getString(id+".location",    "none");
+    ticket.reply       = file.getString(id+".reply",       "none");
+    ticket.admin       = file.getString(id+".admin",       "none");
+    ticket.resolve     = file.getString(id+".resolve",     "none");
+    ticket.resolved_on = file.getString(id+".resolved_on"        );
     return ticket;
   }
   
@@ -48,17 +50,19 @@ public class Ticket {
     this.source.set(this.id+".reply",       this.reply);
     this.source.set(this.id+".admin",       this.admin);
     this.source.set(this.id+".resolve",     this.resolve);
+    this.source.set(this.id+".resolved_on", this.resolved_on);
   }
   
   public void toMessage (CommandSender sender) {
     sender.sendMessage(ChatColor.GOLD + "-- " + ChatColor.WHITE + "Ticket " + this.id + ChatColor.GOLD + " --");
-    sender.sendMessage(" " + ChatColor.BLUE + "Placed By: " + ChatColor.WHITE + this.placed_by);
-    sender.sendMessage(" " + ChatColor.BLUE + "Date: " + ChatColor.WHITE + this.dates);
-    sender.sendMessage(" " + ChatColor.BLUE + "Location: " + ChatColor.RED + (this.location.equalsIgnoreCase("none") ? "None [Console Ticket]" : this.location));
-    sender.sendMessage(" " + ChatColor.BLUE + "Assigned Admin: " + ChatColor.WHITE + this.admin);
-    sender.sendMessage(" " + ChatColor.BLUE + "Ticket: " + ChatColor.GREEN + this.description);
-    sender.sendMessage(" " + ChatColor.BLUE + "Reply: " + ChatColor.YELLOW + this.reply);
-    sender.sendMessage(" " + ChatColor.BLUE + "Resolve: " + ChatColor.YELLOW + this.resolve);
+    sender.sendMessage(" " + ChatColor.BLUE + "Placed By:   " + ChatColor.WHITE + this.placed_by);
+    sender.sendMessage(" " + ChatColor.BLUE + "Date:        " + ChatColor.WHITE + this.dates);
+    sender.sendMessage(" " + ChatColor.BLUE + "Location:    " + ChatColor.WHITE + (this.location.equalsIgnoreCase("none") ? "None [Console Ticket]" : this.location));
+    sender.sendMessage(" " + ChatColor.BLUE + "Assigned:    " + ChatColor.WHITE + this.admin);
+    sender.sendMessage(" " + ChatColor.BLUE + "Ticket:      " + ChatColor.GREEN + this.description);
+    sender.sendMessage(" " + ChatColor.BLUE + "Reply:       " + ChatColor.YELLOW + this.reply);
+    sender.sendMessage(" " + ChatColor.BLUE + "Resolve:     " + ChatColor.YELLOW + this.resolve);
+    sender.sendMessage(" " + ChatColor.BLUE + "Resolved On: " + ChatColor.YELLOW + this.resolved_on);
   }
 
   public String getId() { return id; }
