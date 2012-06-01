@@ -371,6 +371,9 @@ public class TakeaNumber extends JavaPlugin {
   
     ticket.resolve = resolve.toString();
     ticket.resolved_on = TakeaNumber.getCurrentDate();
+    ticket.save();
+    saveTickets();
+    
     resolveTicket(id);
     state.sender.sendMessage(ChatColor.GREEN + " Ticket " + id + " resolved.");
     if (state.isAdmin) {
