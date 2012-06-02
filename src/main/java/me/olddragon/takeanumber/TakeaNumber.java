@@ -89,12 +89,12 @@ public class TakeaNumber extends JavaPlugin {
     expireTickets();
   }
 
-  
+
   @Override
   public void onDisable(){
     log.log(Level.INFO, "[%s] %s disabled.", new Object[]{ getDescription().getName(), getDescription().getVersion() });
   }
-  
+
   public class PListener implements Listener {
 
     public PListener(TakeaNumber instance) {
@@ -207,7 +207,7 @@ public class TakeaNumber extends JavaPlugin {
     String id = args[0];
     if (! isTicket(id)) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     Ticket ticket = Ticket.load(getTickets(), id);
-  
+
     if (ticket == null) {
       state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
     } else if (!state.isAdmin && !ticket.placed_by.equals(state.name)) {
@@ -228,15 +228,15 @@ public class TakeaNumber extends JavaPlugin {
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     if (!state.isAdmin && !ticket.placed_by.equals(state.name)) { state.sender.sendMessage("This is not one of your tickets"); return; }
-    
+
     deleteTicket(id);
     state.sender.sendMessage(ChatColor.GREEN + " Ticket " + ChatColor.RED + id + ChatColor.GREEN + " deleted.");
     if (state.isAdmin) {
       String admin = state.isConsole ? "(Console)" : state.name;
-      
+
       Player target = getServer().getPlayer(ticket.placed_by);
       if (target != null) { target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + admin + ChatColor.GRAY + " has deleted your help ticket"); }
-      
+
       notifyAdmins(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + admin + ChatColor.GRAY + " has deleted ticket " + ChatColor.GOLD + id);
     } else {
       notifyAdmins(ChatColor.GOLD + "* " + ChatColor.GRAY + "User " + ChatColor.GOLD + state.name + ChatColor.GRAY + " has deleted ticket " + ChatColor.GOLD + id);
@@ -257,7 +257,7 @@ public class TakeaNumber extends JavaPlugin {
       for (String id : Tickets) {
         Ticket ticket = Ticket.load(getTickets(), id);
         if (ticket != null && (state.isAdmin || ticket.placed_by.equals(state.name))) {
-          ChatColor color = 
+          ChatColor color =
               !ticket.reply.equals("none") ? ChatColor.YELLOW :
               !ticket.resolve.equals("none") ? ChatColor.GREEN :
               ChatColor.RED;
@@ -285,17 +285,17 @@ public class TakeaNumber extends JavaPlugin {
         return;
       }
     }
-  
+
     java.util.List<String> tickets = getTickets().getStringList("Tickets");
     String next_ticket = String.valueOf(tickets.isEmpty() ? 0 : Integer.parseInt(Ticket.load(getTickets(), tickets.get(tickets.size() - 1)).getId(), 10) + 1);
     Ticket ticket = new Ticket(getTickets(), next_ticket);
-  
+
     StringBuilder message = new StringBuilder();
     for (int i=0; i<args.length; i++) { message.append(args[i]).append(" "); }
-  
+
     ticket.description = message.toString();
     ticket.dates = getCurrentDate();
-  
+
     if (state.isConsole) {
       newTicket(next_ticket, "Console");
       ticket.placed_by = "Console";
@@ -309,10 +309,10 @@ public class TakeaNumber extends JavaPlugin {
         (int)state.player.getLocation().getZ()
       );
     }
-  
+
     ticket.save();
     saveTickets();
-  
+
     state.sender.sendMessage(String.format(
         "%2$sYour ticket (%1$s#%4$s%2$s) has been logged and will be reviewed shortly. Use %3$s/ticket-check %4$s %2$sto review the status in the future.",
         new Object[] { ChatColor.RED, ChatColor.GREEN, ChatColor.YELLOW, ticket.getId() }
@@ -334,7 +334,7 @@ public class TakeaNumber extends JavaPlugin {
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     if (!state.isAdmin && !ticket.placed_by.equals(state.name)) { state.sender.sendMessage("This is not one of your tickets"); return; }
-    
+
     StringBuilder message = new StringBuilder();
     for (int i=1; i<args.length; i++) { message.append(args[i]).append(" "); }
 
@@ -359,27 +359,27 @@ public class TakeaNumber extends JavaPlugin {
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     if (!state.isAdmin && !ticket.placed_by.equals(state.name)) { state.sender.sendMessage("This is not one of your tickets"); return; }
-    
+
     StringBuilder resolve = new StringBuilder();
     if (args.length > 1) {
       for (int i=1; i<args.length; i++) { resolve.append(args[i]).append(" "); }
     } else {
       resolve.append("resolved");
     }
-  
+
     ticket.resolve = resolve.toString();
     ticket.resolved_on = TakeaNumber.getCurrentDate();
     ticket.save();
     saveTickets();
-    
+
     resolveTicket(id);
     state.sender.sendMessage(ChatColor.GREEN + " Ticket " + id + " resolved.");
     if (state.isAdmin) {
       String admin = state.isConsole ? "(Console)" : state.name;
-      
+
       Player target = getServer().getPlayer(ticket.placed_by);
       if (target != null) { target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + admin + ChatColor.GRAY + " has resolved your help ticket"); }
-      
+
       notifyAdmins(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + admin + ChatColor.GRAY + " has resolved ticket " + ChatColor.GOLD + id);
     } else {
       notifyAdmins(ChatColor.GOLD + "* " + ChatColor.GRAY + "User " + ChatColor.GOLD + state.name + ChatColor.GRAY + " has resolved ticket " + ChatColor.GOLD + id);
@@ -397,13 +397,13 @@ public class TakeaNumber extends JavaPlugin {
     if (! isTicket(id)) { state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
-  
+
     ticket.admin = state.name;
     ticket.save();
     saveTickets();
-  
+
     ticket.toMessage(state.sender);
-  
+
     Player target = getServer().getPlayer(getPlayerName(ticket.placed_by));
     if (target != null) { target.sendMessage(ChatColor.GRAY + "Administrator " + ChatColor.GOLD + state.name + ChatColor.GRAY + " is reviewing your help ticket"); }
   }
@@ -452,7 +452,7 @@ public class TakeaNumber extends JavaPlugin {
     getTickets().set(user, count == 0 ? null : count);
     saveTickets();
   }
-  
+
   final static long DAY_IN_MS = 1000 * 60 * 60 * 24;
 
   protected void expireTickets () {
