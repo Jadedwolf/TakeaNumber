@@ -420,7 +420,7 @@ public class TakeaNumber extends JavaPlugin {
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
 
-    if (ticket.location.equals("none")) {
+    if (! ticket.location.equals("none")) {
       String[] vals = ticket.location.split(",");
       World world = Bukkit.getWorld(vals[0]);
       double x = Double.parseDouble(vals[1]);
