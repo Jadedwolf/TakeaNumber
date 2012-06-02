@@ -344,8 +344,16 @@ public class TakeaNumber extends JavaPlugin {
 
     state.sender.sendMessage(ChatColor.GOLD + "* " + ChatColor.WHITE + " Replied to ticket " + ChatColor.GOLD + id + ChatColor.WHITE + ".");
 
-    Player target = getServer().getPlayer(ticket.placed_by);
-    if (target != null) { target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + state.name + ChatColor.GRAY + " has replied to your help ticket."); }
+    if (state.name.equals(ticket.placed_by)) {
+      Player target = getServer().getPlayer(ticket.admin);
+      if (target != null) { target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + ChatColor.GOLD + state.name + ChatColor.GRAY + " has replied to their ticket."); }      
+    } else if (state.isConsole) {
+      Player target = getServer().getPlayer(ticket.placed_by);
+      if (target != null) { target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + ChatColor.GOLD + "The console" + ChatColor.GRAY + " has replied to your help ticket."); }
+    } else if (state.isAdmin) {
+      Player target = getServer().getPlayer(ticket.placed_by);
+      if (target != null) { target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + state.name + ChatColor.GRAY + " has replied to your help ticket."); }
+    }
   }
 
   /**
@@ -414,13 +422,14 @@ public class TakeaNumber extends JavaPlugin {
    * @param args
    */
   private void cmdVisit(State state, String[] args) {
+    if (state.isConsole) { state.player.sendMessage("This command can not be run from the console."); return; }
     if (! state.isAdmin) { state.player.sendMessage("This command can only be run by an admin, use '/ticket-check' instead."); return; }
     String id = args[0];
     if (! isTicket(id)) { state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) { state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id); return; }
 
-    if (! ticket.location.equals("none")) {
+    if (state.player != null && !ticket.location.equals("none")) {
       String[] vals = ticket.location.split(",");
       World world = Bukkit.getWorld(vals[0]);
       double x = Double.parseDouble(vals[1]);
