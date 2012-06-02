@@ -7,7 +7,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -193,7 +192,7 @@ public class TakeaNumber extends JavaPlugin {
     else if (command.equals("ticket-visit")   && args.length == 1) { cmdVisit(state, args);   }
     else if (command.equals("ticket-reply")   && args.length >  1) { cmdReply(state, args);   }
     else if (command.equals("ticket-resolve")                    ) { cmdResolve(state, args); }
-    else if (command.equals("ticket-delete")  && args.length == 0) { cmdDelete(state, args);  }
+    else if (command.equals("ticket-delete")  && args.length == 1) { cmdDelete(state, args);  }
     else { usage(state); }
 
     return true;
@@ -231,7 +230,7 @@ public class TakeaNumber extends JavaPlugin {
     if (!state.isAdmin && !ticket.placed_by.equals(state.name)) { state.sender.sendMessage("This is not one of your tickets"); return; }
     
     deleteTicket(id);
-    
+    state.sender.sendMessage(ChatColor.GREEN + " Ticket " + ChatColor.RED + id + ChatColor.GREEN + " deleted.");
     if (state.isAdmin) {
       String admin = state.isConsole ? "(Console)" : state.name;
       
