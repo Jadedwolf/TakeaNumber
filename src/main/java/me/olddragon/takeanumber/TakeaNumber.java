@@ -278,7 +278,7 @@ public class TakeaNumber extends JavaPlugin {
    */
   private void cmdOpen(State state, String[] args) {
     if (state.player != null) {
-      int count = getTickets().getInt(state.name, 0);
+      int count = getTickets().getInt("counts." + state.name, 0);
       int MaxTickets = getConfig().getInt("MaxTickets");
       if (count >= MaxTickets) {
         state.player.sendMessage(ChatColor.RED + "You've reached your limit of " + MaxTickets + " tickets.");
