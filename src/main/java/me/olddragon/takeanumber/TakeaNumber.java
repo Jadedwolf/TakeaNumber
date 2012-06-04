@@ -481,7 +481,7 @@ public class TakeaNumber extends JavaPlugin {
     // Decrement the users ticket count
     String user = "counts." + Ticket.load(getTickets(), ticket).placed_by;
     int count = getTickets().getInt(user) - 1;
-    getTickets().set(user, count == 0 ? null : count);
+    getTickets().set(user, count < 1 ? null : count);
     
     // Remove the ticket entry
     java.util.List<String> Tickets = getTickets().getStringList("Tickets");
