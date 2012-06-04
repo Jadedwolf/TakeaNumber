@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.olddragon.takeanumber</groupId>
   <artifactId>TakeaNumber</artifactId>
-  <version>0.2.1</version>
+  <version>0.3</version>
   <name>TakeaNumber</name>
   <url>http://jadedwolf.com/</url>
   <properties>
