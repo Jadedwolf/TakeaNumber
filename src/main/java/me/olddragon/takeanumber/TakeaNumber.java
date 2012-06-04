@@ -380,7 +380,6 @@ public class TakeaNumber extends JavaPlugin {
     ticket.save();
     saveTickets();
 
-    resolveTicket(id);
     state.sender.sendMessage(ChatColor.GREEN + " Ticket " + id + " resolved.");
     if (state.isAdmin) {
       String admin = state.isConsole ? "(Console)" : state.name;
@@ -451,17 +450,6 @@ public class TakeaNumber extends JavaPlugin {
     getTickets().set("counts."+user, getTickets().getInt("counts."+user) + 1);
   }
 
-  /**
-   * Close a ticket and decrement the the users ticket count
-   * @param ticket
-   */
-  protected void resolveTicket (String ticket) {
-    String user = "counts." + Ticket.load(getTickets(), ticket).placed_by;
-    int count = getTickets().getInt(user) - 1;
-    getTickets().set(user, count == 0 ? null : count);
-    saveTickets();
-  }
-
   final static long DAY_IN_MS = 1000 * 60 * 60 * 24;
 
   protected void expireTickets () {
@@ -490,10 +478,18 @@ public class TakeaNumber extends JavaPlugin {
    * @param ticket
    */
   protected void deleteTicket (String ticket) {
+    // Decrement the users ticket count
+    String user = "counts." + Ticket.load(getTickets(), ticket).placed_by;
+    int count = getTickets().getInt(user) - 1;
+    getTickets().set(user, count == 0 ? null : count);
+    
+    // Remove the ticket entry
     java.util.List<String> Tickets = getTickets().getStringList("Tickets");
     Tickets.remove(ticket);
     getTickets().set("Tickets", Tickets);
     getTickets().set(ticket, null);
+    
+    // Save changes
     saveTickets();
   }
 
