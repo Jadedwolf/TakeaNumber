@@ -156,7 +156,7 @@ public class TakeaNumber extends JavaPlugin {
     state.sender.sendMessage(ChatColor.BLUE + " /ticket-open <Description>   " + ChatColor.WHITE + " - Open a ticket. Your current location will be recorded.");
     state.sender.sendMessage(ChatColor.BLUE + " /ticket-list                 " + ChatColor.WHITE + " - View your tickets.");
     state.sender.sendMessage(ChatColor.BLUE + " /ticket-check   <#>          " + ChatColor.WHITE + " - Check one of your ticket's info.");
-    state.sender.sendMessage(ChatColor.BLUE + " /ticket-reply   <#> <message>" + ChatColor.WHITE + " - Reply to one of your tickets.");
+    state.sender.sendMessage(ChatColor.BLUE + " /ticket-reply   <#> [message]" + ChatColor.WHITE + " - Reply to one of your tickets.");
     state.sender.sendMessage(ChatColor.BLUE + " /ticket-resolve <#> [message]" + ChatColor.WHITE + " - Resolve one of your tickets.");
     state.sender.sendMessage(ChatColor.BLUE + " /ticket-delete  <#>          " + ChatColor.WHITE + " - Delete one of your tickets.");
     if(state.isAdmin) {
@@ -165,8 +165,8 @@ public class TakeaNumber extends JavaPlugin {
       state.sender.sendMessage(ChatColor.RED + " /ticket-check   <#>          " + ChatColor.WHITE + " - Check a ticket's info.");
       state.sender.sendMessage(ChatColor.RED + " /ticket-take    <#>          " + ChatColor.WHITE + " - Assign yourself to a ticket.");
       state.sender.sendMessage(ChatColor.RED + " /ticket-visit   <#>          " + ChatColor.WHITE + " - Teleport yourself to a ticket location.");
-      state.sender.sendMessage(ChatColor.RED + " /ticket-reply   <#> <message>" + ChatColor.WHITE + " - Reply to a ticket.");
-      state.sender.sendMessage(ChatColor.RED + " /ticket-resovle <#> [message]" + ChatColor.WHITE + " - Close a ticket.");
+      state.sender.sendMessage(ChatColor.RED + " /ticket-reply   <#> [message]" + ChatColor.WHITE + " - Reply to a ticket.");
+      state.sender.sendMessage(ChatColor.RED + " /ticket-resolve <#> [message]" + ChatColor.WHITE + " - Close a ticket.");
       state.sender.sendMessage(ChatColor.RED + " /ticket-delete  <#>          " + ChatColor.WHITE + " - Delete a ticket.");
     }
   }
@@ -191,7 +191,7 @@ public class TakeaNumber extends JavaPlugin {
     else if (command.equals("ticket-take")    && args.length == 1) { cmdTake(state, args);    }
     else if (command.equals("ticket-visit")   && args.length == 1) { cmdVisit(state, args);   }
     else if (command.equals("ticket-reply")   && args.length >  1) { cmdReply(state, args);   }
-    else if (command.equals("ticket-resolve")                    ) { cmdResolve(state, args); }
+    else if (command.equals("ticket-resolve") && args.length >  1) { cmdResolve(state, args); }
     else if (command.equals("ticket-delete")  && args.length == 1) { cmdDelete(state, args);  }
     else { usage(state); }
 
@@ -375,6 +375,7 @@ public class TakeaNumber extends JavaPlugin {
       resolve.append("resolved");
     }
 
+    ticket.reply = "none";
     ticket.resolve = resolve.toString();
     ticket.resolved_on = TakeaNumber.getCurrentDate();
     ticket.save();
