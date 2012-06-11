@@ -1,6 +1,6 @@
 name: TakeaNumber
 main: me.olddragon.takeanumber.TakeaNumber
-version: 0.3
+version: 0.4
 commands:
    ticket-help:
       description: Help Menu.
