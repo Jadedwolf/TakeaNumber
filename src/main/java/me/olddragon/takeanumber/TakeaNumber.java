@@ -277,7 +277,7 @@ public class TakeaNumber extends JavaPlugin {
    * @param args
    */
   private void cmdOpen(State state, String[] args) {
-    if (state.player != null) {
+    if (state.player != null && !state.isAdmin) {
       int count = getTickets().getInt("counts." + state.name, 0);
       int MaxTickets = getConfig().getInt("MaxTickets");
       if (count >= MaxTickets) {
