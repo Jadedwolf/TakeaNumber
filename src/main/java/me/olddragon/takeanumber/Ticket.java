@@ -1,12 +1,20 @@
 package me.olddragon.takeanumber;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class Ticket {
+  /**
+   * Format for tickets
+   */
+  private static Pattern format = Pattern.compile("^\\d+$", Pattern.CASE_INSENSITIVE);
+
   private String id;
-  
 
   public String description;
   public String dates;
@@ -42,6 +50,12 @@ public class Ticket {
     return ticket;
   }
   
+  public static List<Ticket> load (YamlConfiguration file, List<String> ids) {
+    List<Ticket> result = new ArrayList<Ticket>(ids.size());
+    for (String id : ids) { result.add(Ticket.load(file, id)); }
+    return result;
+  }
+  
   public void save () {
     this.source.set(this.id+".description", this.description);
     this.source.set(this.id+".dates",       this.dates);
@@ -63,6 +77,15 @@ public class Ticket {
     if (!this.reply.equals("none")) { sender.sendMessage(" " + ChatColor.BLUE + "Reply: " + ChatColor.YELLOW + this.reply); }
     if (!this.resolve.equals("none")) { sender.sendMessage(" " + ChatColor.BLUE + "Resolve: " + ChatColor.GREEN + this.resolve); }
     if (this.resolved_on != null) { sender.sendMessage(" " + ChatColor.BLUE + "Resolved On: " + ChatColor.GREEN + this.resolved_on); }
+  }
+
+  /**
+   * Checks to see if a string represents a ticket id
+   * @param str string to check
+   * @return true if the string matches the ticket format
+   */
+  public static boolean checkId (String str) {
+    return Ticket.format.matcher(str).matches();
   }
 
   public String getId() { return id; }
