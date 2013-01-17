@@ -1,6 +1,6 @@
 name: TakeaNumber
 main: me.olddragon.takeanumber.TakeaNumber
-version: 0.5.0
+version: 0.5
 commands:
    ticket-help:
       description: Help Menu.
@@ -16,7 +16,7 @@ commands:
       description: Review help tickets
       aliases: [tickets]
       permission: tan.ticket
-      usage: /<command>   
+      usage: /<command>
    ticket-check:
       description: Check a help ticket.
       aliases: [checkticket]
