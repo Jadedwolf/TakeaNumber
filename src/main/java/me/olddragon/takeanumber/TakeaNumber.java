@@ -94,13 +94,13 @@ public class TakeaNumber extends JavaPlugin {
         // declare new listener
         this.listener = new PListener(this);
 
-        log.log(Level.INFO, "[%s] %s enabled.", new Object[]{getDescription().getName(), getDescription().getVersion()});
+        log.log(Level.INFO, "TakeaNumber enabled.", new Object[]{getDescription().getName(), getDescription().getVersion()});
         expireTickets();
     }
 
     @Override
     public void onDisable() {
-        log.log(Level.INFO, "[%s] %s disabled.", new Object[]{getDescription().getName(), getDescription().getVersion()});
+        log.log(Level.INFO, "TakeaNumber disabled.", new Object[]{getDescription().getName(), getDescription().getVersion()});
     }
 
     public class PListener implements Listener {
