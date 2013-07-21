@@ -64,7 +64,7 @@ public class TakeaNumber extends JavaPlugin {
     try {
       tickets_config.save(tickets_file);
     } catch (IOException ex) {
-      Logger.getLogger(JavaPlugin.class.getName()).log(Level.SEVERE, Messages.getFormatted("TakeaNumber.ErrorSaving", tickets_file.toString()), ex); //$NON-NLS-1$
+      Logger.getLogger(JavaPlugin.class.getName()).log(Level.SEVERE, Messages.getFormatted("Error.Config.Save", tickets_file.toString()), ex); //$NON-NLS-1$
     }
   }
 
@@ -81,7 +81,7 @@ public class TakeaNumber extends JavaPlugin {
       try {
         date_format = new SimpleDateFormat(format);
       } catch (IllegalArgumentException ex) {
-        Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, Messages.getFormatted("TakeaNumber.InvalidDateFormat", format), ex); //$NON-NLS-1$
+        Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, Messages.getFormatted("Error.Date.InvalidFormat", format), ex); //$NON-NLS-1$
         date_format = new SimpleDateFormat();
       }
     }
@@ -151,14 +151,14 @@ public class TakeaNumber extends JavaPlugin {
   }
 
   static String[] user_commands = new String[] {
-    "TakeaNumber.UserCommandHeading", "TakeaNumber.UserCommandOpen", "TakeaNumber.UserCommandList", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    "TakeaNumber.UserCommandCheck", "TakeaNumber.UserCommandReply", "TakeaNumber.UserCommandResolve", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    "TakeaNumber.UserCommandDelete" //$NON-NLS-1$
+    "Command.User.Heading", "Command.User.Open", "Command.User.List", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    "Command.User.Check", "Command.User.Reply", "Command.User.Resolve", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    "Command.User.Delete" //$NON-NLS-1$
   };
   static String[] admin_commands = new String[] {
-    "TakeaNumber.AdminCommandHeading", "TakeaNumber.AdminCommandList", "TakeaNumber.AdminCommandCheck", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    "TakeaNumber.AdminCommandTake", "TakeaNumber.AdminCommandVisit", "TakeaNumber.AdminCommandReply", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    "TakeaNumber.AdminCommandResolve", "TakeaNumber.AdminCommandDelete" //$NON-NLS-1$ //$NON-NLS-2$
+    "Command.Admin.Heading", "Command.Admin.List", "Command.Admin.Check", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    "Command.Admin.Take", "Command.Admin.Visit", "Command.Admin.Reply", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    "Command.Admin.Resolve", "Command.Admin.Delete" //$NON-NLS-1$ //$NON-NLS-2$
   };
   /**
    * Display the list of commands
@@ -559,7 +559,7 @@ public class TakeaNumber extends JavaPlugin {
           }
         }
       } catch (ParseException e) {
-        log.log(Level.WARNING, Messages.getFormatted("TakeaNumber.ErrorParsingDate", e.getLocalizedMessage())); //$NON-NLS-1$
+        log.log(Level.WARNING, Messages.getFormatted("Error.Date.Parse", e.getLocalizedMessage())); //$NON-NLS-1$
       }
     }
     log.log(Level.INFO, Messages.getFormatted("TakeaNumber.DeletedTickets", count)); //$NON-NLS-1$
