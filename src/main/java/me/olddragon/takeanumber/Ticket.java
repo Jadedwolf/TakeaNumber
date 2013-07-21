@@ -52,21 +52,36 @@ public class Ticket {
   }
 
   public void toMessage(CommandSender sender) {
-    sender.sendMessage(Messages.getFormatted("Ticket.Heading", this.id)); //$NON-NLS-1$
-    sender.sendMessage(Messages.getFormatted("Ticket.Description", this.description)); //$NON-NLS-1$
-    sender.sendMessage(Messages.getFormatted("Ticket.Date", this.dates)); //$NON-NLS-1$
-    sender.sendMessage(Messages.getFormatted("Ticket.Location", (this.location.equalsIgnoreCase("none") ? Messages.getString("Ticket.Location.None") : this.location))); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    sender.sendMessage(Messages.getFormatted("Ticket.PlacedBy", this.placed_by)); //$NON-NLS-1$
-    sender.sendMessage(Messages.getFormatted("Ticket.Assigned", this.admin)); //$NON-NLS-1$
+    Messages.sendMessage(sender, "Ticket.Heading", this.id); //$NON-NLS-1$
+    Messages.sendMessage(sender, "Ticket.Description", this.description); //$NON-NLS-1$
+    Messages.sendMessage(sender, "Ticket.Date", this.dates); //$NON-NLS-1$
+    Messages.sendMessage(sender, "Ticket.Location", (this.location.equalsIgnoreCase("none") ? Messages.getString("Ticket.Location.None") : this.location)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    Messages.sendMessage(sender, "Ticket.PlacedBy", this.placed_by); //$NON-NLS-1$
+    Messages.sendMessage(sender, "Ticket.Assigned", this.admin); //$NON-NLS-1$
     if (!this.reply.equals("none")) { //$NON-NLS-1$
-      sender.sendMessage(Messages.getFormatted("Ticket.Reply", this.reply)); //$NON-NLS-1$
+      Messages.sendMessage(sender, "Ticket.Reply", this.reply); //$NON-NLS-1$
     }
     if (!this.resolve.equals("none")) { //$NON-NLS-1$
-      sender.sendMessage(Messages.getFormatted("Ticket.Resolve", this.resolve)); //$NON-NLS-1$
+      Messages.sendMessage(sender, "Ticket.Resolve", this.resolve); //$NON-NLS-1$
     }
     if (this.resolved_on != null) {
-      sender.sendMessage(Messages.getFormatted("Ticket.ResolvedOn", this.resolved_on)); //$NON-NLS-1$
+      Messages.sendMessage(sender, "Ticket.ResolvedOn", this.resolved_on); //$NON-NLS-1$
     }
+  }
+  
+  public Object[] toObject() {
+    Object[] values = {
+      getId(),
+      description,
+      dates,
+      placed_by,
+      location,
+      reply,
+      admin,
+      resolve,
+      resolved_on
+    };
+    return values;
   }
 
   public String getId() {

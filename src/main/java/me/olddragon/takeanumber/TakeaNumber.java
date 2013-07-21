@@ -9,8 +9,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -64,7 +64,7 @@ public class TakeaNumber extends JavaPlugin {
     try {
       tickets_config.save(tickets_file);
     } catch (IOException ex) {
-      Logger.getLogger(JavaPlugin.class.getName()).log(Level.SEVERE, Messages.getFormatted("Error.Config.Save", tickets_file.toString()), ex); //$NON-NLS-1$
+      Logger.getLogger(JavaPlugin.class.getName()).log(Level.SEVERE, Messages.getString("Error.Config.Save", tickets_file.toString()), ex); //$NON-NLS-1$
     }
   }
 
@@ -81,7 +81,7 @@ public class TakeaNumber extends JavaPlugin {
       try {
         date_format = new SimpleDateFormat(format);
       } catch (IllegalArgumentException ex) {
-        Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, Messages.getFormatted("Error.Date.InvalidFormat", format), ex); //$NON-NLS-1$
+        Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, Messages.getString("Error.Date.InvalidFormat", format), ex); //$NON-NLS-1$
         date_format = new SimpleDateFormat();
       }
     }
@@ -101,7 +101,7 @@ public class TakeaNumber extends JavaPlugin {
 
   @Override
   public void onDisable() {
-    log.log(Level.INFO, Messages.getFormatted("TakeaNumber.Disabled", getDescription().getName(), getDescription().getVersion())); //$NON-NLS-1$
+    log.log(Level.INFO, Messages.getString("TakeaNumber.Disabled", getDescription().getName(), getDescription().getVersion())); //$NON-NLS-1$
   }
 
   public class PListener implements Listener {
@@ -121,7 +121,7 @@ public class TakeaNumber extends JavaPlugin {
           }
           int length = getTickets().getStringList("Tickets").size(); //$NON-NLS-1$
           if (length > 0) {
-            player.sendMessage(Messages.getFormatted("TakeaNumber.NumberOfTickets", length)); //$NON-NLS-1$
+            player.sendMessage(Messages.getString("TakeaNumber.NumberOfTickets", length)); //$NON-NLS-1$
           }
         }
       }
@@ -150,12 +150,12 @@ public class TakeaNumber extends JavaPlugin {
     return pName;
   }
 
-  static String[] user_commands = new String[] {
+  private static final String[] user_commands = new String[] {
     "Command.User.Heading", "Command.User.Open", "Command.User.List", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     "Command.User.Check", "Command.User.Reply", "Command.User.Resolve", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     "Command.User.Delete" //$NON-NLS-1$
   };
-  static String[] admin_commands = new String[] {
+  private static final String[] admin_commands = new String[] {
     "Command.Admin.Heading", "Command.Admin.List", "Command.Admin.Check", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     "Command.Admin.Take", "Command.Admin.Visit", "Command.Admin.Reply", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     "Command.Admin.Resolve", "Command.Admin.Delete" //$NON-NLS-1$ //$NON-NLS-2$
@@ -167,9 +167,9 @@ public class TakeaNumber extends JavaPlugin {
    * @param isAdmin Show the administrator commands
    */
   protected void usage(State state) {
-    for (String command : user_commands) { state.sender.sendMessage(Messages.getString(command)); }
+    for (String command : user_commands) { Messages.sendMessage(state.sender, command); }
     if (state.isAdmin) {
-      for (String command : admin_commands) { state.sender.sendMessage(Messages.getString(command)); }
+      for (String command : admin_commands) { Messages.sendMessage(state.sender, command); }
     }
   }
 
@@ -222,15 +222,15 @@ public class TakeaNumber extends JavaPlugin {
   private void cmdCheck(State state, String[] args) {
     String id = args[0];
     if (!isTicket(id)) {
-      state.sender.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
       return;
     }
     Ticket ticket = Ticket.load(getTickets(), id);
 
     if (ticket == null) {
-      state.sender.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
     } else if (!state.isAdmin && !ticket.placed_by.equals(state.name)) {
-      state.sender.sendMessage(Messages.getString("TakeaNumber.NotYourTicket")); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "TakeaNumber.NotYourTicket"); //$NON-NLS-1$
     } else {
       ticket.toMessage(state.sender);
     }
@@ -245,32 +245,30 @@ public class TakeaNumber extends JavaPlugin {
   private void cmdDelete(State state, String[] args) {
     String id = args[0];
     if (!isTicket(id)) {
-      state.player.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
       return;
     }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) {
-      state.sender.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
       return;
     }
     if (!state.isAdmin && !ticket.placed_by.equals(state.name)) {
-      state.sender.sendMessage(Messages.getString("TakeaNumber.NotYourTicket")); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "TakeaNumber.NotYourTicket"); //$NON-NLS-1$
       return;
     }
 
     deleteTicket(id);
-    state.sender.sendMessage(Messages.getFormatted("TakeaNumber.DeletedTicket", id)); //$NON-NLS-1$
+    Messages.sendMessage(state.sender, "TakeaNumber.DeletedTicket", id); //$NON-NLS-1$
     if (state.isAdmin) {
-      String admin = state.isConsole ? "(Console)" : state.name; //$NON-NLS-1$
-
+      String admin = state.isConsole ? Messages.getString("TakeaNumber.Console") : state.name; //$NON-NLS-1$
       Player target = getServer().getPlayer(ticket.placed_by);
       if (target != null) {
-        target.sendMessage("* Administrator " + admin + " has deleted your help ticket");
+        Messages.sendMessage(target, "Ticket.AdminDeleted", id, admin); //$NON-NLS-1$
       }
-
-      notifyAdmins("* Administrator " + admin + " has deleted ticket " + id);
+      notifyAdmins(Messages.getString("Ticket.AdminDeleted", id, admin)); //$NON-NLS-1$
     } else {
-      notifyAdmins("* User " + state.name + " has deleted ticket " + id);
+      notifyAdmins(Messages.getString("Ticket.UserDeleted", id, state.name)); //$NON-NLS-1$
     }
   }
 
@@ -283,20 +281,20 @@ public class TakeaNumber extends JavaPlugin {
   private void cmdList(State state, String[] args) {
     java.util.List<String> Tickets = getTickets().getStringList("Tickets"); //$NON-NLS-1$
     if (Tickets.isEmpty()) {
-      state.sender.sendMessage(ChatColor.WHITE + Messages.getString("TakeaNumber.8")); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "Command.List.Empty"); //$NON-NLS-1$
     } else {
-      state.sender.sendMessage(ChatColor.GOLD + "-- " + ChatColor.WHITE + Messages.getString("TakeaNumber.9") + ChatColor.GOLD + " --"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      Messages.sendMessage(state.sender, "Command.List.Heading"); //$NON-NLS-1$
       for (String id : Tickets) {
         Ticket ticket = Ticket.load(getTickets(), id);
         if (ticket != null && (state.isAdmin || ticket.placed_by.equals(state.name))) {
-          ChatColor color =
-                  !ticket.reply.equals("none") ? ChatColor.YELLOW //$NON-NLS-1$
-                  : !ticket.resolve.equals("none") ? ChatColor.GREEN //$NON-NLS-1$
-                  : ChatColor.RED;
-          state.sender.sendMessage(
-                  ChatColor.GOLD + " (" + color + ticket.getId() + ChatColor.GOLD + ") " //$NON-NLS-1$ //$NON-NLS-2$
-                  + ChatColor.BLUE + ticket.placed_by + ": " + color + ticket.description //$NON-NLS-1$
-                  + (ticket.location.equals("none") ? "" : " @ " + ticket.location)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+          Object[] values = ticket.toObject();
+          if (!ticket.reply.equals("none")) { //$NON-NLS-1$
+            Messages.sendMessage(state.sender, "Command.List.Replied", values); //$NON-NLS-1$
+          } else if (!ticket.resolve.equals("none")) { //$NON-NLS-1$
+            Messages.sendMessage(state.sender, "Command.List.Resolved", values); //$NON-NLS-1$
+          } else {
+            Messages.sendMessage(state.sender, "Command.List.Open", values); //$NON-NLS-1$
+          }
         }
       }
     }
@@ -313,7 +311,7 @@ public class TakeaNumber extends JavaPlugin {
       int count = getTickets().getInt("counts." + state.name, 0); //$NON-NLS-1$
       int MaxTickets = getConfig().getInt("MaxTickets"); //$NON-NLS-1$
       if (count >= MaxTickets) {
-        state.player.sendMessage(ChatColor.RED + "You've reached your limit of " + MaxTickets + " tickets."); //$NON-NLS-1$ //$NON-NLS-2$
+        Messages.sendMessage(state.player, "Ticket.MaxTickets", MaxTickets); //$NON-NLS-1$
         return;
       }
     }
@@ -331,8 +329,8 @@ public class TakeaNumber extends JavaPlugin {
     ticket.dates = getCurrentDate();
 
     if (state.isConsole) {
-      newTicket(next_ticket, "Console"); //$NON-NLS-1$
-      ticket.placed_by = "Console"; //$NON-NLS-1$
+      newTicket(next_ticket, Messages.getString("TakeaNumber.Console")); //$NON-NLS-1$
+      ticket.placed_by = Messages.getString("TakeaNumber.Console"); //$NON-NLS-1$
     } else {
       newTicket(next_ticket, state.player.getDisplayName());
       ticket.placed_by = state.player.getDisplayName();
@@ -346,8 +344,8 @@ public class TakeaNumber extends JavaPlugin {
     ticket.save();
     saveTickets();
 
-    state.sender.sendMessage(Messages.getFormatted("TakeaNumber.10", ticket.getId())); //$NON-NLS-1$
-    notifyAdmins(Messages.getFormatted("TakeaNumber.11", (state.isConsole ? Messages.getString("TakeaNumber.Console") : state.name))); //$NON-NLS-1$ //$NON-NLS-2$
+    Messages.sendMessage(state.sender, "Tickets.Created", ticket.getId()); //$NON-NLS-1$
+    notifyAdmins(Messages.getString("Ticket.Created", (state.isConsole ? Messages.getString("TakeaNumber.Console") : state.name))); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /**
@@ -359,16 +357,16 @@ public class TakeaNumber extends JavaPlugin {
   private void cmdReply(State state, String[] args) {
     String id = args[0];
     if (!isTicket(id)) {
-      state.player.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
       return;
     }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) {
-      state.sender.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
       return;
     }
     if (!state.isAdmin && !ticket.placed_by.equals(state.name)) {
-      state.sender.sendMessage(Messages.getString("TakeaNumber.NotYourTicket")); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "TakeaNumber.NotYourTicket"); //$NON-NLS-1$
       return;
     }
 
@@ -377,26 +375,25 @@ public class TakeaNumber extends JavaPlugin {
       message.append(args[i]).append(" "); //$NON-NLS-1$
     }
 
-    ticket.reply = (state.isConsole ? "(Console) " : "(" + state.name + ") ") + message.toString(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    ticket.reply = Messages.getString("Command.Reply.Format", state.isConsole ? Messages.getString("TakeaNumber.Console") : state.name, message.toString()); //$NON-NLS-1$ //$NON-NLS-2$
     ticket.save();
     saveTickets();
 
-    state.sender.sendMessage(ChatColor.GOLD + "* " + ChatColor.WHITE + " Replied to ticket " + ChatColor.GOLD + id + ChatColor.WHITE + "."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-
+    Messages.sendMessage(state.sender, "Command.Reply.Replied", id); //$NON-NLS-1$
     if (state.name.equals(ticket.placed_by)) {
       Player target = getServer().getPlayer(ticket.admin);
       if (target != null) {
-        target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + ChatColor.GOLD + state.name + ChatColor.GRAY + " has replied to their ticket."); //$NON-NLS-1$ //$NON-NLS-2$
+        Messages.sendMessage(target, "Command.Reply.User", state.name); //$NON-NLS-1$
       }
     } else if (state.isConsole) {
       Player target = getServer().getPlayer(ticket.placed_by);
       if (target != null) {
-        target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + ChatColor.GOLD + "The console" + ChatColor.GRAY + " has replied to your help ticket."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        Messages.sendMessage(target, "Command.Reply.Console"); //$NON-NLS-1$
       }
     } else if (state.isAdmin) {
       Player target = getServer().getPlayer(ticket.placed_by);
       if (target != null) {
-        target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + state.name + ChatColor.GRAY + " has replied to your help ticket."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        Messages.sendMessage(target, "Command.Reply.Admin", state.name); //$NON-NLS-1$
       }
     }
   }
@@ -410,16 +407,16 @@ public class TakeaNumber extends JavaPlugin {
   private void cmdResolve(State state, String[] args) {
     String id = args[0];
     if (!isTicket(id)) {
-      state.player.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
       return;
     }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) {
-      state.sender.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
       return;
     }
     if (!state.isAdmin && !ticket.placed_by.equals(state.name)) {
-      state.sender.sendMessage(Messages.getString("TakeaNumber.NotYourTicket")); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "TakeaNumber.NotYourTicket"); //$NON-NLS-1$
       return;
     }
 
@@ -438,18 +435,16 @@ public class TakeaNumber extends JavaPlugin {
     ticket.save();
     saveTickets();
 
-    state.sender.sendMessage(" Ticket " + id + " resolved.");
+    Messages.sendMessage(state.sender, "Command.Resolve.Resolved", id); //$NON-NLS-1$
     if (state.isAdmin) {
-      String admin = state.isConsole ? "(Console)" : state.name; //$NON-NLS-1$
-
+      String admin = state.isConsole ? Messages.getString("TakeaNumber.Console") : state.name; //$NON-NLS-1$
       Player target = getServer().getPlayer(ticket.placed_by);
       if (target != null) {
-        target.sendMessage("* Administrator " + admin + " has resolved your help ticket");
+        Messages.sendMessage(target, "Command.Resolve.Admin", admin); //$NON-NLS-1$
       }
-
-      notifyAdmins("* Administrator " + admin + " has resolved ticket " + id);
+      notifyAdmins(Messages.getString("Command.Resolve.Admin", id, admin)); //$NON-NLS-1$
     } else {
-      notifyAdmins("* User " + state.name + " has resolved ticket " + id);
+      notifyAdmins(Messages.getString("Command.Resolve.User", id, state.name)); //$NON-NLS-1$
     }
   }
 
@@ -461,17 +456,17 @@ public class TakeaNumber extends JavaPlugin {
    */
   private void cmdTake(State state, String[] args) {
     if (!state.isAdmin) {
-      state.player.sendMessage(Messages.getString("TakeaNumber.AdminOnlyCommand")); //$NON-NLS-1$
+      Messages.sendMessage(state.player, "Error.Command.AdminOnly"); //$NON-NLS-1$
       return;
     }
     String id = args[0];
     if (!isTicket(id)) {
-      state.player.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
       return;
     }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) {
-      state.sender.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
       return;
     }
 
@@ -483,7 +478,7 @@ public class TakeaNumber extends JavaPlugin {
 
     Player target = getServer().getPlayer(getPlayerName(ticket.placed_by));
     if (target != null) {
-      target.sendMessage(ChatColor.GRAY + "Administrator " + ChatColor.GOLD + state.name + ChatColor.GRAY + " is reviewing your help ticket"); //$NON-NLS-1$ //$NON-NLS-2$
+      Messages.sendMessage(target, "Command.Take.Notify", state.name); //$NON-NLS-1$
     }
   }
 
@@ -495,21 +490,21 @@ public class TakeaNumber extends JavaPlugin {
    */
   private void cmdVisit(State state, String[] args) {
     if (state.isConsole) {
-      state.player.sendMessage(Messages.getString("TakeaNumber.NoConsoleCommand")); //$NON-NLS-1$
+      Messages.sendMessage(state.player, "Error.Command.NoConsole"); //$NON-NLS-1$
       return;
     }
     if (!state.isAdmin) {
-      state.player.sendMessage(Messages.getString("TakeaNumber.AdminOnlyCommand")); //$NON-NLS-1$
+      Messages.sendMessage(state.player, "Error.Command.AdminOnly"); //$NON-NLS-1$
       return;
     }
     String id = args[0];
     if (!isTicket(id)) {
-      state.player.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
       return;
     }
     Ticket ticket = Ticket.load(getTickets(), id);
     if (ticket == null) {
-      state.sender.sendMessage(Messages.getFormatted("TakeaNumber.InvalidTicketNumber", id)); //$NON-NLS-1$
+      Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id); //$NON-NLS-1$
       return;
     }
 
@@ -559,10 +554,10 @@ public class TakeaNumber extends JavaPlugin {
           }
         }
       } catch (ParseException e) {
-        log.log(Level.WARNING, Messages.getFormatted("Error.Date.Parse", e.getLocalizedMessage())); //$NON-NLS-1$
+        log.log(Level.WARNING, Messages.getString("Error.Date.Parse", e.getLocalizedMessage())); //$NON-NLS-1$
       }
     }
-    log.log(Level.INFO, Messages.getFormatted("TakeaNumber.DeletedTickets", count)); //$NON-NLS-1$
+    log.log(Level.INFO, Messages.getString("TakeaNumber.DeletedTickets", count)); //$NON-NLS-1$
   }
 
   /**
