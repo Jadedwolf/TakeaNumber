@@ -1,0 +1,49 @@
+name: TakeaNumber
+main: me.olddragon.takeanumber.TakeaNumber
+version: 0.6
+commands:
+   ticket-help:
+      description: Help Menu.
+      aliases: [tickethelp, tan, closeticket]
+      permission:
+      usage: /<command>
+   ticket-open:
+      description: Open a help ticket.
+      aliases: [ticket, report, rpt, tkt]
+      permission: tan.ticket
+      usage: /<command> <Description>
+   ticket-list:
+      description: Review help tickets
+      aliases: [tickets]
+      permission: tan.ticket
+      usage: /<command>
+   ticket-check:
+      description: Check a help ticket.
+      aliases: [checkticket]
+      permission: tan.ticket
+      usage: /<command> <#>
+   ticket-visit:
+      description: Teleport to a help ticket.
+      aliases: [visitticket, ticket-tp, tpticket]
+      permission: tan.admin
+      usage: /<command> <#>
+   ticket-reply:
+      description: Reply to a help ticket.
+      aliases: [replyticket]
+      permission: tan.ticket
+      usage: /<command> <#> <reply>
+   ticket-take:
+      description: Take a help ticket.
+      aliases: [taketicket]
+      permission: tan.admin
+      usage: /<command> <#>
+   ticket-resolve:
+      description: Resolve a help ticket, starts the expiration time.
+      aliases: [resolveticket]
+      permission: tan.ticket
+      usage: /<command> <#>
+   ticket-delete:
+      description: Delete a help ticket, not letting it expire.
+      aliases: [deleteticket]
+      permission: tan.ticket
+      usage: /<command> <#>
