@@ -48,6 +48,8 @@ function sprintfn ($format, array $args = array()) {
 }
 
 function processTicket ($ticket, $full) {
+  global $template;
+
   if (!isset($full["admin"])      ) { $full["admin"]       = "none"; }
   if (!isset($full["reply"])      ) { $full["reply"]       = "none"; }
   if (!isset($full["resolve"])    ) { $full["resolve"]     = "none"; }
@@ -83,11 +85,11 @@ function processTicket ($ticket, $full) {
 
     .ticket         { margin: 1em 1em 0; padding: 1em; color: #fff; background-color: #222; border: 1px solid #666; }
     .ticket .title  { padding-bottom: 0.25em; margin-bottom: 0.25em; border-bottom: 1px dotted #666; }
-    .ticket.reply .title   { color: #620; }
-    .ticket.resolve .title { color: #060; }
-    .ticket.open .title    { color: #600; }
+    .ticket.reply .title   { color: #ff0; }
+    .ticket.resolve .title { color: #0f0; }
+    .ticket.open .title    { color: #f00; }
     
-    #copyright { text-align: center; font-size: smaller; color: #fff; }
+    #copyright { margin-top: 12px; text-align: center; font-size: smaller; color: #fff; }
   </style>
 </head>
 <body>
