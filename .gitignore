@@ -46,3 +46,4 @@ debug.log
 # Doxygen
 /docs/html
 debug.txt
+/.buildpath
