@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 import org.bukkit.command.CommandSender;
 
 public class Messages {
-  private static final String BUNDLE_NAME = "me.olddragon.takeanumber.messages"; //$NON-NLS-1$
+  private static final String BUNDLE_NAME = "translations/messages"; //$NON-NLS-1$
   private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
 
   private Messages() {}
