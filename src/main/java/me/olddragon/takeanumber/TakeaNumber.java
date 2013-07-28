@@ -448,7 +448,7 @@ public class TakeaNumber extends JavaPlugin {
         }
 
         ticket.reply = "none";
-        ticket.resolve = resolve.toString();
+        ticket.resolve = "(" + (state.isConsole ? "Console " : state.name) + ") " + resolve.toString();
         ticket.resolved_on = TakeaNumber.getCurrentDate();
         ticket.save();
         saveTickets();
