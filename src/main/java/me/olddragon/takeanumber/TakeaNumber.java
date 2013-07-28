@@ -41,10 +41,10 @@ public class TakeaNumber extends JavaPlugin {
 
   public void loadTickets() {
     if (tickets_file == null) {
-      tickets_file = new File(getDataFolder(), ""); //$NON-NLS-1$
+      tickets_file = new File(getDataFolder(), "Tickets.yml"); //$NON-NLS-1$
     }
     tickets_config = YamlConfiguration.loadConfiguration(tickets_file);
-    InputStream defaults = getResource(""); //$NON-NLS-1$
+    InputStream defaults = getResource("Tickets.yml"); //$NON-NLS-1$
     if (defaults != null) {
       tickets_config.setDefaults(YamlConfiguration.loadConfiguration(defaults));
     }
