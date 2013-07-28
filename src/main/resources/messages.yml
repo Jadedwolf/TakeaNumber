@@ -1,0 +1,81 @@
+General:
+  ConsoleName : 'Console'
+  Enabled     : 'TakeaNumber enabled.'
+  Disabled    : 'TakeaNumber disabled.'                        # %1 = Description, %2 = Version
+  Login       : '* There are currently %1$d open Help Tickets' # %1 = Number of Tickets
+Ticket:
+  Assigned    : ' Assigned: %1$s'
+  Date        : ' Date: %1$s'
+  Description : ' Ticket: %1$s'
+  Heading     : '-- Ticket %1$s --'
+  Location:
+    Label     : ' Location: %1$s'
+    None      : 'None [Console Ticket]'
+  PlacedBy    : ' Placed By: %1$s'
+  Reply       : ' Reply: %1$s'
+  Resolve     : ' Resolve: %1$s'
+  ResolvedOn  : ' Resolved On: %1$s'
+Command:
+  List:
+    Heading  : '-- Current Help Tickets --'
+    Empty    : ' There are currently no help tickets to display.'
+    # %1 = id, %2 = description, %2 = dates, %3 = placed_by, %4 = location,
+    # %5 = reply, %6 = admin, %7 = resolve, %8 = resolved_on
+    Replied  : ' (%1$s) %3$s: %2$s @ %4$s'
+    Resolved : ' (%1$s) %3$s: %2$s @ %4$s'
+    Open     : ' (%1$s) %3$s: %2$s @ %4$s'
+  Create:
+    User     : 'Your ticket (#%1$s) has been logged and will be reviewed shortly. Use /ticket-check to review the status in the future.' # %1 = Ticket ID
+    Admin    : '* %1$s has opened a ticket'                            # %1 = Player Name or Console
+  Take:
+    Notify   : '%1$s is reviewing your help ticket'                    # %1 = Administrator name
+  Reply:
+    Format   : '(%1$s) %2$s'                                           # %1 = Console/User Name, %2 = message 
+    Replied  : '* Replied to ticket %1$s.'                             # %1 = Ticket Id
+    User     : '* %1$s has replied to their ticket.'                   # %1 = User name
+    Console  : '* The console has replied to your help ticket.'
+    Admin    : '* Administrator %1$s has replied to your help ticket.' # %1 = Administrator name
+  Resolve:
+    Resolved : '* Ticket %1$s resolved.'                                # %1 = Ticket Id
+    Admin    : '* Administrator %2$s has resolved ticket %1$s'         # %1 = Ticket Id, %2 = Administrator name
+    User     : '* User %2$s has resolved ticket %1$s'                  # %1 = Ticket Id, %2 = User name
+  Delete:
+    User     : '* User %2$s has deleted ticket %1$s'                   # %1 = Ticket Id, %2 = User Name
+    Admin    : '* Administrator %2$s has deleted ticket %1$s'          # %1 = Ticket Id, %2 = Administrator Name
+    Notify   : '* Deleted Ticket #%1$s'                                 # %1 = Ticket Id
+  Help:
+    User:
+      Heading : '-- Commands --'
+      Check   : ' /ticket-check   <#>           - Check one of your tickets info.'
+      Delete  : ' /ticket-delete  <#>           - Delete one of your tickets.'
+      List    : ' /ticket-list                  - View your tickets.'
+      Open    : ' /ticket-open <Description>    - Open a ticket. Your current location will be recorded.'
+      Reply   : ' /ticket-reply   <#> [message] - Reply to one of your tickets.'
+      Resolve : ' /ticket-resolve <#> [message] - Resolve one of your tickets.'
+    Admin:
+      Heading : '-- Admin Commands --'
+      Check   : ' /ticket-check   <#>           - Check a tickets info.'
+      Delete  : ' /ticket-delete  <#>           - Delete a ticket.'
+      List    : ' /ticket-list                  - List all tickets'
+      Reply   : ' /ticket-reply   <#> [message] - Reply to a ticket.'
+      Resolve : ' /ticket-resolve <#> [message] - Close a ticket.'
+      Take    : ' /ticket-take    <#>           - Assign yourself to a ticket.'
+      Visit   : ' /ticket-visit   <#>           - Teleport yourself to a ticket location.'
+Expire:
+  Started : 'Deleting Expired Tickets'
+  Finished: '%1$d expired tickets were deleted.'     # %1 = Number of tickets deleted
+Error:
+  Tickets:
+    Save          : 'Could not save tickets to %1$s'                                        # %1 = File name
+  Ticket:
+    NotOwner      : 'This is not your ticket.'
+    InvalidNumber : 'Invalid Ticket Number: %1$s'                                           # %1 = Ticket ID
+    Limit         : 'You have reached the limit of %1$s tickets.'                           # %1 = maximum number of tickets
+  Messages:
+    Save          : 'Could not save messages to %1$s'                                       # %1 = File name
+  Date:
+    InvalidFormat : 'Invalid date format: %1$s'                                             # %1 = format
+    Parse         : 'Error reading resolved on date for ticket - %1$s'                      # %1 = Parse Exception
+  Command:
+    NoConsole     : 'This command can not be run from the console.'
+    AdminOnly     : 'This command can only be run by an admin, use "/ticket-check" instead.'
