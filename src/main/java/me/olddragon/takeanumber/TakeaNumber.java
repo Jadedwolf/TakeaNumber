@@ -2,7 +2,6 @@ package me.olddragon.takeanumber;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -44,10 +43,6 @@ public class TakeaNumber extends JavaPlugin {
       tickets_file = new File(getDataFolder(), "Tickets.yml");
     }
     tickets_config = YamlConfiguration.loadConfiguration(tickets_file);
-    InputStream defaults = getResource("Tickets.yml");
-    if (defaults != null) {
-      tickets_config.setDefaults(YamlConfiguration.loadConfiguration(defaults));
-    }
   }
 
   public YamlConfiguration getTickets() {
@@ -77,14 +72,10 @@ public class TakeaNumber extends JavaPlugin {
     saveConfig();
     
     // Load the messages
-    File messages_file = new File(getDataFolder(), "Messages.yml");
-    Messages.load(messages_file);
-    Messages.setDefaults(getResource("Messages.yml"));
-    try {
-      Messages.save(messages_file);
-    } catch (IOException ex) {
-      Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, Messages.getString("Error.Messages.Save", messages_file.toString()), ex);
-    }
+    File messages = new File(getDataFolder(), "messages.yml");
+    if (!messages.exists()) { saveResource("messages.yml", false); }
+    Messages.load(messages);
+    Messages.setDefaults(getResource("messages.yml"));
 
     if (date_format == null) {
       String format = getConfig().getString("DateFormat");
