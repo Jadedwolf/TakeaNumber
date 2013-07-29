@@ -32,8 +32,8 @@ public class Messages {
   }
 
   public static String getString(String key) {
-    String msg = ChatColor.translateAlternateColorCodes('&', yaml.getString(key));
-    return msg != null ? msg : '!' + key + '!';
+    String msg = yaml.getString(key);
+    return msg != null ? ChatColor.translateAlternateColorCodes('&', msg) : '!' + key + '!';
   }
   
   public static String getString(String key, Object... args) {
