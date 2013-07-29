@@ -1,89 +1,102 @@
 package me.olddragon.takeanumber;
 
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 public class Ticket {
+  private String id;
+  public String description;
+  public String dates;
+  public String placed_by;
+  public String location;
+  public String reply;
+  public String admin;
+  public String resolve;
+  public String resolved_on;
+  private YamlConfiguration source;
 
-    private String id;
-    public String description;
-    public String dates;
-    public String placed_by;
-    public String location;
-    public String reply;
-    public String admin;
-    public String resolve;
-    public String resolved_on;
-    private YamlConfiguration source;
+  public Ticket(YamlConfiguration source, String id) {
+    this.id = id;
+    this.source = source;
+  }
 
-    public Ticket(YamlConfiguration source, String id) {
-        this.id = id;
-        this.source = source;
+  public static boolean exists(YamlConfiguration file, String id) {
+    return file.contains(id);
+  }
+
+  public static Ticket load(YamlConfiguration file, String id) {
+    if (!exists(file, id)) {
+      return null;
     }
+    Ticket ticket = new Ticket(file, id);
+    ticket.description = file.getString(id + ".description"); //$NON-NLS-1$
+    ticket.dates = file.getString(id + ".dates"); //$NON-NLS-1$
+    ticket.placed_by = file.getString(id + ".placedby"); //$NON-NLS-1$
+    ticket.location = file.getString(id + ".location", "none"); //$NON-NLS-1$ //$NON-NLS-2$
+    ticket.reply = file.getString(id + ".reply", "none"); //$NON-NLS-1$ //$NON-NLS-2$
+    ticket.admin = file.getString(id + ".admin", "none"); //$NON-NLS-1$ //$NON-NLS-2$
+    ticket.resolve = file.getString(id + ".resolve", "none"); //$NON-NLS-1$ //$NON-NLS-2$
+    ticket.resolved_on = file.getString(id + ".resolved_on"); //$NON-NLS-1$
+    return ticket;
+  }
 
-    public static boolean exists(YamlConfiguration file, String id) {
-        return file.contains(id);
-    }
+  public void save() {
+    this.source.set(this.id + ".description", this.description); //$NON-NLS-1$
+    this.source.set(this.id + ".dates", this.dates); //$NON-NLS-1$
+    this.source.set(this.id + ".placedby", this.placed_by); //$NON-NLS-1$
+    this.source.set(this.id + ".location", this.location); //$NON-NLS-1$
+    this.source.set(this.id + ".reply", this.reply); //$NON-NLS-1$
+    this.source.set(this.id + ".admin", this.admin); //$NON-NLS-1$
+    this.source.set(this.id + ".resolve", this.resolve); //$NON-NLS-1$
+    this.source.set(this.id + ".resolved_on", this.resolved_on); //$NON-NLS-1$
+  }
 
-    public static Ticket load(YamlConfiguration file, String id) {
-        if (!exists(file, id)) {
-            return null;
-        }
-        Ticket ticket = new Ticket(file, id);
-        ticket.description = file.getString(id + ".description");
-        ticket.dates = file.getString(id + ".dates");
-        ticket.placed_by = file.getString(id + ".placedby");
-        ticket.location = file.getString(id + ".location", "none");
-        ticket.reply = file.getString(id + ".reply", "none");
-        ticket.admin = file.getString(id + ".admin", "none");
-        ticket.resolve = file.getString(id + ".resolve", "none");
-        ticket.resolved_on = file.getString(id + ".resolved_on");
-        return ticket;
+  public void toMessage(CommandSender sender) {
+    Messages.sendMessage(sender, "Ticket.Heading", this.id); //$NON-NLS-1$
+    Messages.sendMessage(sender, "Ticket.Description", this.description); //$NON-NLS-1$
+    Messages.sendMessage(sender, "Ticket.Date", this.dates); //$NON-NLS-1$
+    Messages.sendMessage(sender, "Ticket.Location", (this.location.equalsIgnoreCase("none") ? Messages.getString("Ticket.Location.None") : this.location)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    Messages.sendMessage(sender, "Ticket.PlacedBy", this.placed_by); //$NON-NLS-1$
+    Messages.sendMessage(sender, "Ticket.Assigned", this.admin); //$NON-NLS-1$
+    if (!this.reply.equals("none")) { //$NON-NLS-1$
+      Messages.sendMessage(sender, "Ticket.Reply", this.reply); //$NON-NLS-1$
     }
+    if (!this.resolve.equals("none")) { //$NON-NLS-1$
+      Messages.sendMessage(sender, "Ticket.Resolve", this.resolve); //$NON-NLS-1$
+    }
+    if (this.resolved_on != null) {
+      Messages.sendMessage(sender, "Ticket.ResolvedOn", this.resolved_on); //$NON-NLS-1$
+    }
+  }
+  
+  public Object[] toObject() {
+    Object[] values = {
+      getId(),
+      description,
+      dates,
+      placed_by,
+      location,
+      reply,
+      admin,
+      resolve,
+      resolved_on
+    };
+    return values;
+  }
 
-    public void save() {
-        this.source.set(this.id + ".description", this.description);
-        this.source.set(this.id + ".dates", this.dates);
-        this.source.set(this.id + ".placedby", this.placed_by);
-        this.source.set(this.id + ".location", this.location);
-        this.source.set(this.id + ".reply", this.reply);
-        this.source.set(this.id + ".admin", this.admin);
-        this.source.set(this.id + ".resolve", this.resolve);
-        this.source.set(this.id + ".resolved_on", this.resolved_on);
-    }
+  public String getId() {
+    return id;
+  }
 
-    public void toMessage(CommandSender sender) {
-        sender.sendMessage(ChatColor.GOLD + "-- " + ChatColor.WHITE + "Ticket " + this.id + ChatColor.GOLD + " --");
-        sender.sendMessage(" " + ChatColor.BLUE + "Ticket: " + ChatColor.RED + this.description);
-        sender.sendMessage(" " + ChatColor.BLUE + "Date: " + ChatColor.WHITE + this.dates);
-        sender.sendMessage(" " + ChatColor.BLUE + "Location: " + ChatColor.WHITE + (this.location.equalsIgnoreCase("none") ? "None [Console Ticket]" : this.location));
-        sender.sendMessage(" " + ChatColor.BLUE + "Placed By: " + ChatColor.WHITE + this.placed_by);
-        sender.sendMessage(" " + ChatColor.BLUE + "Assigned: " + ChatColor.WHITE + this.admin);
-        if (!this.reply.equals("none")) {
-            sender.sendMessage(" " + ChatColor.BLUE + "Reply: " + ChatColor.YELLOW + this.reply);
-        }
-        if (!this.resolve.equals("none")) {
-            sender.sendMessage(" " + ChatColor.BLUE + "Resolve: " + ChatColor.GREEN + this.resolve);
-        }
-        if (this.resolved_on != null) {
-            sender.sendMessage(" " + ChatColor.BLUE + "Resolved On: " + ChatColor.GREEN + this.resolved_on);
-        }
-    }
+  public void setId(String id) {
+    this.id = id;
+  }
 
-    public String getId() {
-        return id;
-    }
+  public YamlConfiguration getSource() {
+    return this.source;
+  }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public YamlConfiguration getSource() {
-        return this.source;
-    }
-
-    public void setSource(YamlConfiguration source) {
-        this.source = source;
-    }
+  public void setSource(YamlConfiguration source) {
+    this.source = source;
+  }
 }

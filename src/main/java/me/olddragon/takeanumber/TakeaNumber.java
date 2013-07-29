@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -63,7 +62,7 @@ public class TakeaNumber extends JavaPlugin {
         try {
             tickets_config.save(tickets_file);
         } catch (IOException ex) {
-            Logger.getLogger(JavaPlugin.class.getName()).log(Level.SEVERE, "Could not save config to " + tickets_file.toString(), ex);
+            Logger.getLogger(JavaPlugin.class.getName()).log(Level.SEVERE, Messages.getString("Error.Tickets.Save", tickets_file.toString()), ex);
         }
     }
 
@@ -75,12 +74,22 @@ public class TakeaNumber extends JavaPlugin {
         cfgOptions.copyHeader(true);
         saveConfig();
 
+        // Load the messages
+        File messages_file = new File(getDataFolder(), "Messages.yml");
+        Messages.load(messages_file);
+        Messages.setDefaults(getResource("Messages.yml"));
+        try {
+            Messages.save(messages_file);
+        } catch (IOException ex) {
+            Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, Messages.getString("Error.Messages.Save", messages_file.toString()), ex);
+        }
+
         if (date_format == null) {
             String format = getConfig().getString("DateFormat");
             try {
                 date_format = new SimpleDateFormat(format);
             } catch (IllegalArgumentException ex) {
-                Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, "Invalid date format: " + format, ex);
+                Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, Messages.getString("Error.Date.InvalidFormat", format), ex);
                 date_format = new SimpleDateFormat();
             }
         }
@@ -94,13 +103,13 @@ public class TakeaNumber extends JavaPlugin {
         // declare new listener
         this.listener = new PListener(this);
 
-        log.log(Level.INFO, "TakeaNumber enabled.", new Object[]{getDescription().getName(), getDescription().getVersion()});
+        log.log(Level.INFO, Messages.getString("General.Enabled"), new Object[]{getDescription().getName(), getDescription().getVersion()});
         expireTickets();
     }
 
     @Override
     public void onDisable() {
-        log.log(Level.INFO, "TakeaNumber disabled.", new Object[]{getDescription().getName(), getDescription().getVersion()});
+        log.log(Level.INFO, Messages.getString("General.Disabled", getDescription().getName(), getDescription().getVersion()));
     }
 
     public class PListener implements Listener {
@@ -118,22 +127,13 @@ public class TakeaNumber extends JavaPlugin {
                     if (getConfig().getBoolean("AlwaysLoadTickets", false)) {
                         loadTickets();
                     }
-                    int ticklength = getTickets().getStringList("Tickets").size();
-                    if (ticklength > 0) {
-                        player.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "There are currently " + ChatColor.GOLD + ticklength + ChatColor.GRAY + " open Help Tickets");
+                    int length = getTickets().getStringList("Tickets").size();
+                    if (length > 0) {
+                        player.sendMessage(Messages.getString("General.Login", length));
                     }
                 }
             }
         }
-    }
-
-    public class State {
-
-        public CommandSender sender;
-        public Player player;
-        public String name;
-        public boolean isConsole;
-        public boolean isAdmin;
     }
 
     /**
@@ -157,6 +157,16 @@ public class TakeaNumber extends JavaPlugin {
         }
         return pName;
     }
+    private static final String[] user_commands = new String[]{
+        "Command.Help.User.Heading", "Command.Help.User.Open", "Command.Help.User.List",
+        "Command.Help.User.Check", "Command.Help.User.Reply", "Command.Help.User.Resolve",
+        "Command.Help.User.Delete"
+    };
+    private static final String[] admin_commands = new String[]{
+        "Command.Help.Admin.Heading", "Command.Help.Admin.List", "Command.Help.Admin.Check",
+        "Command.Help.Admin.Take", "Command.Help.Admin.Visit", "Command.Help.Admin.Reply",
+        "Command.Help.Admin.Resolve", "Command.Help.Admin.Delete"
+    };
 
     /**
      * Display the list of commands
@@ -165,22 +175,13 @@ public class TakeaNumber extends JavaPlugin {
      * @param isAdmin Show the administrator commands
      */
     protected void usage(State state) {
-        state.sender.sendMessage(ChatColor.GOLD + "-- " + ChatColor.WHITE + "Commands" + ChatColor.GOLD + " --");
-        state.sender.sendMessage(ChatColor.BLUE + " /ticket-open <Description>   " + ChatColor.WHITE + " - Open a ticket. Your current location will be recorded.");
-        state.sender.sendMessage(ChatColor.BLUE + " /ticket-list                 " + ChatColor.WHITE + " - View your tickets.");
-        state.sender.sendMessage(ChatColor.BLUE + " /ticket-check   <#>          " + ChatColor.WHITE + " - Check one of your ticket's info.");
-        state.sender.sendMessage(ChatColor.BLUE + " /ticket-reply   <#> [message]" + ChatColor.WHITE + " - Reply to one of your tickets.");
-        state.sender.sendMessage(ChatColor.BLUE + " /ticket-resolve <#> [message]" + ChatColor.WHITE + " - Resolve one of your tickets.");
-        state.sender.sendMessage(ChatColor.BLUE + " /ticket-delete  <#>          " + ChatColor.WHITE + " - Delete one of your tickets.");
+        for (String command : user_commands) {
+            Messages.sendMessage(state.sender, command);
+        }
         if (state.isAdmin) {
-            state.sender.sendMessage(ChatColor.GOLD + "-- " + ChatColor.WHITE + "Admin Commands" + ChatColor.GOLD + " --");
-            state.sender.sendMessage(ChatColor.RED + " /ticket-list                 " + ChatColor.WHITE + " - List all tickets");
-            state.sender.sendMessage(ChatColor.RED + " /ticket-check   <#>          " + ChatColor.WHITE + " - Check a ticket's info.");
-            state.sender.sendMessage(ChatColor.RED + " /ticket-take    <#>          " + ChatColor.WHITE + " - Assign yourself to a ticket.");
-            state.sender.sendMessage(ChatColor.RED + " /ticket-visit   <#>          " + ChatColor.WHITE + " - Teleport yourself to a ticket location.");
-            state.sender.sendMessage(ChatColor.RED + " /ticket-reply   <#> [message]" + ChatColor.WHITE + " - Reply to a ticket.");
-            state.sender.sendMessage(ChatColor.RED + " /ticket-resolve <#> [message]" + ChatColor.WHITE + " - Close a ticket.");
-            state.sender.sendMessage(ChatColor.RED + " /ticket-delete  <#>          " + ChatColor.WHITE + " - Delete a ticket.");
+            for (String command : admin_commands) {
+                Messages.sendMessage(state.sender, command);
+            }
         }
     }
 
@@ -233,15 +234,15 @@ public class TakeaNumber extends JavaPlugin {
     private void cmdCheck(State state, String[] args) {
         String id = args[0];
         if (!isTicket(id)) {
-            state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id);
             return;
         }
         Ticket ticket = Ticket.load(getTickets(), id);
 
         if (ticket == null) {
-            state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id);
         } else if (!state.isAdmin && !ticket.placed_by.equals(state.name)) {
-            state.sender.sendMessage("This is not your ticket to check");
+            Messages.sendMessage(state.sender, "Error.Ticket.NotOwner");
         } else {
             ticket.toMessage(state.sender);
         }
@@ -256,32 +257,30 @@ public class TakeaNumber extends JavaPlugin {
     private void cmdDelete(State state, String[] args) {
         String id = args[0];
         if (!isTicket(id)) {
-            state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id);
             return;
         }
         Ticket ticket = Ticket.load(getTickets(), id);
         if (ticket == null) {
-            state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id);
             return;
         }
         if (!state.isAdmin && !ticket.placed_by.equals(state.name)) {
-            state.sender.sendMessage("This is not one of your tickets");
+            Messages.sendMessage(state.sender, "Error.Ticket.NotOwner");
             return;
         }
 
         deleteTicket(id);
-        state.sender.sendMessage(ChatColor.GREEN + " Ticket " + ChatColor.RED + id + ChatColor.GREEN + " deleted.");
+        Messages.sendMessage(state.sender, "Command.Delete.Notify", id);
         if (state.isAdmin) {
-            String admin = state.isConsole ? "(Console)" : state.name;
-
+            String admin = state.isConsole ? Messages.getString("General.ConsoleName") : state.name;
             Player target = getServer().getPlayer(ticket.placed_by);
             if (target != null) {
-                target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + admin + ChatColor.GRAY + " has deleted your help ticket");
+                Messages.sendMessage(target, "Command.Delete.Admin", id, admin);
             }
-
-            notifyAdmins(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + admin + ChatColor.GRAY + " has deleted ticket " + ChatColor.GOLD + id);
+            notifyAdmins(Messages.getString("Command.Delete.Admin", id, admin));
         } else {
-            notifyAdmins(ChatColor.GOLD + "* " + ChatColor.GRAY + "User " + ChatColor.GOLD + state.name + ChatColor.GRAY + " has deleted ticket " + ChatColor.GOLD + id);
+            notifyAdmins(Messages.getString("Command.Delete.User", id, state.name));
         }
     }
 
@@ -294,20 +293,20 @@ public class TakeaNumber extends JavaPlugin {
     private void cmdList(State state, String[] args) {
         java.util.List<String> Tickets = getTickets().getStringList("Tickets");
         if (Tickets.isEmpty()) {
-            state.sender.sendMessage(ChatColor.WHITE + " There are currently no help tickets to display.");
+            Messages.sendMessage(state.sender, "Command.List.Empty");
         } else {
-            state.sender.sendMessage(ChatColor.GOLD + "-- " + ChatColor.WHITE + "Current Help Tickets" + ChatColor.GOLD + " --");
+            Messages.sendMessage(state.sender, "Command.List.Heading");
             for (String id : Tickets) {
                 Ticket ticket = Ticket.load(getTickets(), id);
                 if (ticket != null && (state.isAdmin || ticket.placed_by.equals(state.name))) {
-                    ChatColor color =
-                            !ticket.reply.equals("none") ? ChatColor.YELLOW
-                            : !ticket.resolve.equals("none") ? ChatColor.GREEN
-                            : ChatColor.RED;
-                    state.sender.sendMessage(
-                            ChatColor.GOLD + " (" + color + ticket.getId() + ChatColor.GOLD + ") "
-                            + ChatColor.BLUE + ticket.placed_by + ": " + color + ticket.description
-                            + (ticket.location.equals("none") ? "" : " @ " + ticket.location));
+                    Object[] values = ticket.toObject();
+                    if (!ticket.reply.equals("none")) {
+                        Messages.sendMessage(state.sender, "Command.List.Replied", values);
+                    } else if (!ticket.resolve.equals("none")) {
+                        Messages.sendMessage(state.sender, "Command.List.Resolved", values);
+                    } else {
+                        Messages.sendMessage(state.sender, "Command.List.Open", values);
+                    }
                 }
             }
         }
@@ -324,7 +323,7 @@ public class TakeaNumber extends JavaPlugin {
             int count = getTickets().getInt("counts." + state.name, 0);
             int MaxTickets = getConfig().getInt("MaxTickets");
             if (count >= MaxTickets) {
-                state.player.sendMessage(ChatColor.RED + "You've reached your limit of " + MaxTickets + " tickets.");
+                Messages.sendMessage(state.player, "Ticket.MaxTickets", MaxTickets);
                 return;
             }
         }
@@ -342,8 +341,8 @@ public class TakeaNumber extends JavaPlugin {
         ticket.dates = getCurrentDate();
 
         if (state.isConsole) {
-            newTicket(next_ticket, "Console");
-            ticket.placed_by = "Console";
+            newTicket(next_ticket, Messages.getString("General.ConsoleName"));
+            ticket.placed_by = Messages.getString("General.ConsoleName");
         } else {
             newTicket(next_ticket, state.player.getDisplayName());
             ticket.placed_by = state.player.getDisplayName();
@@ -357,12 +356,8 @@ public class TakeaNumber extends JavaPlugin {
         ticket.save();
         saveTickets();
 
-        state.sender.sendMessage(String.format(
-                "%2$sYour ticket (%1$s#%4$s%2$s) has been logged and will be reviewed shortly. Use %3$s/ticket-check %4$s %2$sto review the status in the future.",
-                new Object[]{ChatColor.RED, ChatColor.GREEN, ChatColor.YELLOW, ticket.getId()}));
-        notifyAdmins(String.format(
-                "%2$s* %1$s%3$s %2$shas opened a ticket",
-                new Object[]{ChatColor.GOLD, ChatColor.WHITE, (state.isConsole ? "Console" : state.name)}));
+        Messages.sendMessage(state.sender, "Command.Create.User", ticket.getId());
+        notifyAdmins(Messages.getString("Command.Create.Admin", (state.isConsole ? Messages.getString("General.ConsoleName") : state.name)));
     }
 
     /**
@@ -374,16 +369,16 @@ public class TakeaNumber extends JavaPlugin {
     private void cmdReply(State state, String[] args) {
         String id = args[0];
         if (!isTicket(id)) {
-            state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id);
             return;
         }
         Ticket ticket = Ticket.load(getTickets(), id);
         if (ticket == null) {
-            state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id);
             return;
         }
         if (!state.isAdmin && !ticket.placed_by.equals(state.name)) {
-            state.sender.sendMessage("This is not one of your tickets");
+            Messages.sendMessage(state.sender, "Error.Ticket.NotOwner");
             return;
         }
 
@@ -392,26 +387,25 @@ public class TakeaNumber extends JavaPlugin {
             message.append(args[i]).append(" ");
         }
 
-        ticket.reply = (state.isConsole ? "(Console) " : "(" + state.name + ") ") + message.toString();
+        ticket.reply = Messages.getString("Command.Reply.Format", state.isConsole ? Messages.getString("General.ConsoleName") : state.name, message.toString());
         ticket.save();
         saveTickets();
 
-        state.sender.sendMessage(ChatColor.GOLD + "* " + ChatColor.WHITE + " Replied to ticket " + ChatColor.GOLD + id + ChatColor.WHITE + ".");
-
+        Messages.sendMessage(state.sender, "Command.Reply.Replied", id);
         if (state.name.equals(ticket.placed_by)) {
             Player target = getServer().getPlayer(ticket.admin);
             if (target != null) {
-                target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + ChatColor.GOLD + state.name + ChatColor.GRAY + " has replied to their ticket.");
+                Messages.sendMessage(target, "Command.Reply.User", state.name);
             }
         } else if (state.isConsole) {
             Player target = getServer().getPlayer(ticket.placed_by);
             if (target != null) {
-                target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + ChatColor.GOLD + "The console" + ChatColor.GRAY + " has replied to your help ticket.");
+                Messages.sendMessage(target, "Command.Reply.Console");
             }
         } else if (state.isAdmin) {
             Player target = getServer().getPlayer(ticket.placed_by);
             if (target != null) {
-                target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + state.name + ChatColor.GRAY + " has replied to your help ticket.");
+                Messages.sendMessage(target, "Command.Reply.Admin", state.name);
             }
         }
     }
@@ -425,16 +419,16 @@ public class TakeaNumber extends JavaPlugin {
     private void cmdResolve(State state, String[] args) {
         String id = args[0];
         if (!isTicket(id)) {
-            state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id);
             return;
         }
         Ticket ticket = Ticket.load(getTickets(), id);
         if (ticket == null) {
-            state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id);
             return;
         }
         if (!state.isAdmin && !ticket.placed_by.equals(state.name)) {
-            state.sender.sendMessage("This is not one of your tickets");
+            Messages.sendMessage(state.sender, "Error.Ticket.NotOwner");
             return;
         }
 
@@ -453,18 +447,16 @@ public class TakeaNumber extends JavaPlugin {
         ticket.save();
         saveTickets();
 
-        state.sender.sendMessage(ChatColor.GREEN + " Ticket " + id + " resolved.");
+        Messages.sendMessage(state.sender, "Command.Resolve.Resolved", id);
         if (state.isAdmin) {
-            String admin = state.isConsole ? "(Console)" : state.name;
-
+            String admin = state.isConsole ? Messages.getString("General.ConsoleName") : state.name;
             Player target = getServer().getPlayer(ticket.placed_by);
             if (target != null) {
-                target.sendMessage(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + admin + ChatColor.GRAY + " has resolved your help ticket");
+                Messages.sendMessage(target, "Command.Resolve.Admin", admin);
             }
-
-            notifyAdmins(ChatColor.GOLD + "* " + ChatColor.GRAY + "Administrator " + ChatColor.GOLD + admin + ChatColor.GRAY + " has resolved ticket " + ChatColor.GOLD + id);
+            notifyAdmins(Messages.getString("Command.Resolve.Admin", id, admin));
         } else {
-            notifyAdmins(ChatColor.GOLD + "* " + ChatColor.GRAY + "User " + ChatColor.GOLD + state.name + ChatColor.GRAY + " has resolved ticket " + ChatColor.GOLD + id);
+            notifyAdmins(Messages.getString("Command.Resolve.User", id, state.name));
         }
     }
 
@@ -476,17 +468,17 @@ public class TakeaNumber extends JavaPlugin {
      */
     private void cmdTake(State state, String[] args) {
         if (!state.isAdmin) {
-            state.player.sendMessage("This command can only be run by an admin, use '/ticket-check' instead.");
+            Messages.sendMessage(state.player, "Error.Command.AdminOnly");
             return;
         }
         String id = args[0];
         if (!isTicket(id)) {
-            state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id);
             return;
         }
         Ticket ticket = Ticket.load(getTickets(), id);
         if (ticket == null) {
-            state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id);
             return;
         }
 
@@ -498,7 +490,7 @@ public class TakeaNumber extends JavaPlugin {
 
         Player target = getServer().getPlayer(getPlayerName(ticket.placed_by));
         if (target != null) {
-            target.sendMessage(ChatColor.GRAY + "Administrator " + ChatColor.GOLD + state.name + ChatColor.GRAY + " is reviewing your help ticket");
+            Messages.sendMessage(target, "Command.Take.Notify", state.name);
         }
     }
 
@@ -510,21 +502,21 @@ public class TakeaNumber extends JavaPlugin {
      */
     private void cmdVisit(State state, String[] args) {
         if (state.isConsole) {
-            state.player.sendMessage("This command can not be run from the console.");
+            Messages.sendMessage(state.player, "Error.Command.NoConsole");
             return;
         }
         if (!state.isAdmin) {
-            state.player.sendMessage("This command can only be run by an admin, use '/ticket-check' instead.");
+            Messages.sendMessage(state.player, "Error.Command.AdminOnly");
             return;
         }
         String id = args[0];
         if (!isTicket(id)) {
-            state.player.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id);
             return;
         }
         Ticket ticket = Ticket.load(getTickets(), id);
         if (ticket == null) {
-            state.sender.sendMessage(ChatColor.RED + "Invalid Ticket Number: " + ChatColor.WHITE + id);
+            Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id);
             return;
         }
 
@@ -552,6 +544,9 @@ public class TakeaNumber extends JavaPlugin {
     }
     final static long DAY_IN_MS = 1000 * 60 * 60 * 24;
 
+    /**
+     * Delete tickets older than the expiration period.
+     */
     protected void expireTickets() {
         int days = getConfig().getInt("ResolvedTicketExpiration", 7);
         if (days == 0) {
@@ -560,7 +555,7 @@ public class TakeaNumber extends JavaPlugin {
         Date expiration = new Date(System.currentTimeMillis() - (days * TakeaNumber.DAY_IN_MS));
         java.util.List<String> Tickets = getTickets().getStringList("Tickets");
         int count = 0;
-        log.log(Level.INFO, "Deleting Expired Tickets");
+        log.log(Level.INFO, Messages.getString("Expire.Started"));
         for (String id : Tickets) {
             try {
                 Ticket ticket = Ticket.load(getTickets(), id);
@@ -571,10 +566,10 @@ public class TakeaNumber extends JavaPlugin {
                     }
                 }
             } catch (ParseException e) {
-                log.log(Level.WARNING, "Error reading resolved on date for ticket - %s", new Object[]{e.getLocalizedMessage()});
+                log.log(Level.WARNING, Messages.getString("Error.Date.Parse", e.getLocalizedMessage()));
             }
         }
-        log.log(Level.INFO, "Deleted %d Tickets", new Object[]{count});
+        log.log(Level.INFO, Messages.getString("Expire.Finished", count));
     }
 
     /**
