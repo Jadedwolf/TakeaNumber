@@ -130,10 +130,10 @@ public class TakeaNumber extends JavaPlugin {
   }
 
   /**
-   * Get the player name
+   * Get the player name from a number of sources
    *
    * @param name
-   * @return
+   * @return player name
    */
   public String getPlayerName(String name) {
     Player caddPlayer = getServer().getPlayerExact(name);
@@ -264,10 +264,10 @@ public class TakeaNumber extends JavaPlugin {
     if (state.isAdmin) {
       String admin = state.isConsole ? Messages.getString("General.ConsoleName") : state.name;
       Player target = getServer().getPlayer(ticket.placed_by);
-      if (target != null) {
+      if (target != null && target != state.player) {
         Messages.sendMessage(target, "Command.Delete.Admin", id, admin);
       }
-      notifyAdmins(Messages.getString("Command.Delete.Admin", id, admin));
+      notifyAdmins(Messages.getString("Command.Delete.Admin", id, admin), state.player);
     } else {
       notifyAdmins(Messages.getString("Command.Delete.User", id, state.name));
     }
@@ -346,7 +346,10 @@ public class TakeaNumber extends JavaPlugin {
     saveTickets();
 
     Messages.sendMessage(state.sender, "Command.Create.User", ticket.getId());
-    notifyAdmins(Messages.getString("Command.Create.Admin", (state.isConsole ? Messages.getString("General.ConsoleName") : state.name)));
+    notifyAdmins(
+      Messages.getString("Command.Create.Admin", (state.isConsole ? Messages.getString("General.ConsoleName") : state.name)),
+      state.player
+    );
   }
 
   /**
@@ -440,10 +443,10 @@ public class TakeaNumber extends JavaPlugin {
     if (state.isAdmin) {
       String admin = state.isConsole ? Messages.getString("General.ConsoleName") : state.name;
       Player target = getServer().getPlayer(ticket.placed_by);
-      if (target != null) {
+      if (target != null && target != state.player) {
         Messages.sendMessage(target, "Command.Resolve.Admin", admin);
       }
-      notifyAdmins(Messages.getString("Command.Resolve.Admin", id, admin));
+      notifyAdmins(Messages.getString("Command.Resolve.Admin", id, admin), state.player);
     } else {
       notifyAdmins(Messages.getString("Command.Resolve.User", id, state.name));
     }
@@ -602,12 +605,21 @@ public class TakeaNumber extends JavaPlugin {
    * @param message message to send
    */
   protected void notifyAdmins(String message) {
+    notifyAdmins(message, null);
+  }
+  
+  /**
+   * Notify all online administrators excluding the player
+   * @param message message to send
+   * @param player exclude this player from the notification
+   */
+  protected void notifyAdmins(String message, Player player) {
     if (!getConfig().getBoolean("NotifyAdminOnTicketClose")) {
       return;
     }
     Player[] players = Bukkit.getOnlinePlayers();
     for (Player op : players) {
-      if (op.hasPermission("tan.admin")) {
+      if (op.hasPermission("tan.admin") && (player == null || op != player)) {
         op.sendMessage(message);
       }
     }
