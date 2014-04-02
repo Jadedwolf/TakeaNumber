@@ -2,13 +2,13 @@ package me.olddragon.takeanumber;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,12 +26,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class TakeaNumber extends JavaPlugin {
 
-    static final Logger log = Logger.getLogger("Minecraft");
-    public static SimpleDateFormat date_format = null;
-    private YamlConfiguration tickets_config = null;
-    private File tickets_file = null;
-    @SuppressWarnings("unused")
-    private PListener listener = null;
+  static final Logger log = Logger.getLogger("Minecraft");
+  
+  public static SimpleDateFormat date_format = null;
+  private YamlConfiguration tickets_config = null;
+  private File tickets_file = null;
+  @SuppressWarnings("unused")
+  private PListener listener = null;
 
     public static String getCurrentDate() {
         return date_format.format(Calendar.getInstance().getTime());
@@ -42,18 +43,14 @@ public class TakeaNumber extends JavaPlugin {
             tickets_file = new File(getDataFolder(), "Tickets.yml");
         }
         tickets_config = YamlConfiguration.loadConfiguration(tickets_file);
-        InputStream defaults = getResource("Tickets.yml");
-        if (defaults != null) {
-            tickets_config.setDefaults(YamlConfiguration.loadConfiguration(defaults));
-        }
     }
 
-    public YamlConfiguration getTickets() {
-        if (tickets_config == null) {
-            loadTickets();
-        }
-        return tickets_config;
+  public YamlConfiguration getTickets() {
+    if (tickets_config == null) {
+      loadTickets();
     }
+    return tickets_config;
+  }
 
     public void saveTickets() {
         if (tickets_config == null || tickets_file == null) {
@@ -75,14 +72,10 @@ public class TakeaNumber extends JavaPlugin {
         saveConfig();
 
         // Load the messages
-        File messages_file = new File(getDataFolder(), "Messages.yml");
-        Messages.load(messages_file);
-        Messages.setDefaults(getResource("Messages.yml"));
-        try {
-            Messages.save(messages_file);
-        } catch (IOException ex) {
-            Logger.getLogger(JavaPlugin.class.getName()).log(Level.WARNING, Messages.getString("Error.Messages.Save", messages_file.toString()), ex);
-        }
+    File messages = new File(getDataFolder(), "messages.yml");
+    if (!messages.exists()) { saveResource("messages.yml", false); }
+    Messages.load(messages);
+    Messages.setDefaults(getResource("messages.yml"));
 
         if (date_format == null) {
             String format = getConfig().getString("DateFormat");
@@ -137,10 +130,10 @@ public class TakeaNumber extends JavaPlugin {
     }
 
     /**
-     * Get the player name
+   * Get the player name from a number of sources
      *
      * @param name
-     * @return
+   * @return player name
      */
     public String getPlayerName(String name) {
         Player caddPlayer = getServer().getPlayerExact(name);
@@ -157,17 +150,17 @@ public class TakeaNumber extends JavaPlugin {
         }
         return pName;
     }
-    private static final String[] user_commands = new String[]{
+
+  private static final String[] user_commands = new String[] {
         "Command.Help.User.Heading", "Command.Help.User.Open", "Command.Help.User.List",
         "Command.Help.User.Check", "Command.Help.User.Reply", "Command.Help.User.Resolve",
         "Command.Help.User.Delete"
     };
-    private static final String[] admin_commands = new String[]{
+  private static final String[] admin_commands = new String[] {
         "Command.Help.Admin.Heading", "Command.Help.Admin.List", "Command.Help.Admin.Check",
         "Command.Help.Admin.Take", "Command.Help.Admin.Visit", "Command.Help.Admin.Reply",
         "Command.Help.Admin.Resolve", "Command.Help.Admin.Delete"
     };
-
     /**
      * Display the list of commands
      *
@@ -175,13 +168,9 @@ public class TakeaNumber extends JavaPlugin {
      * @param isAdmin Show the administrator commands
      */
     protected void usage(State state) {
-        for (String command : user_commands) {
-            Messages.sendMessage(state.sender, command);
-        }
+    for (String command : user_commands) { Messages.sendMessage(state.sender, command); }
         if (state.isAdmin) {
-            for (String command : admin_commands) {
-                Messages.sendMessage(state.sender, command);
-            }
+      for (String command : admin_commands) { Messages.sendMessage(state.sender, command); }
         }
     }
 
@@ -225,18 +214,18 @@ public class TakeaNumber extends JavaPlugin {
         return true;
     }
 
-    /**
-     * Get a tickets information
-     *
-     * @param state
-     * @param args
-     */
-    private void cmdCheck(State state, String[] args) {
-        String id = args[0];
-        if (!isTicket(id)) {
-            Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id);
-            return;
-        }
+  /**
+   * Get a tickets information
+   *
+   * @param state
+   * @param args
+   */
+  private void cmdCheck(State state, String[] args) {
+    String id = args[0];
+    if (!isTicket(id)) {
+      Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id);
+      return;
+    }
         Ticket ticket = Ticket.load(getTickets(), id);
 
         if (ticket == null) {
@@ -275,10 +264,10 @@ public class TakeaNumber extends JavaPlugin {
         if (state.isAdmin) {
             String admin = state.isConsole ? Messages.getString("General.ConsoleName") : state.name;
             Player target = getServer().getPlayer(ticket.placed_by);
-            if (target != null) {
+      if (target != null && target != state.player) {
                 Messages.sendMessage(target, "Command.Delete.Admin", id, admin);
             }
-            notifyAdmins(Messages.getString("Command.Delete.Admin", id, admin));
+      notifyAdmins(Messages.getString("Command.Delete.Admin", id, admin), state.player);
         } else {
             notifyAdmins(Messages.getString("Command.Delete.User", id, state.name));
         }
@@ -312,21 +301,21 @@ public class TakeaNumber extends JavaPlugin {
         }
     }
 
-    /**
-     * Open a new ticket
-     *
-     * @param state
-     * @param args
-     */
-    private void cmdOpen(State state, String[] args) {
-        if (state.player != null && !state.isAdmin) {
-            int count = getTickets().getInt("counts." + state.name, 0);
-            int MaxTickets = getConfig().getInt("MaxTickets");
-            if (count >= MaxTickets) {
-                Messages.sendMessage(state.player, "Ticket.MaxTickets", MaxTickets);
-                return;
-            }
-        }
+  /**
+   * Open a new ticket
+   *
+   * @param state
+   * @param args
+   */
+  private void cmdOpen(State state, String[] args) {
+    if (state.player != null && !state.isAdmin) {
+      int count = getTickets().getInt("counts." + state.name, 0);
+      int MaxTickets = getConfig().getInt("MaxTickets");
+      if (count >= MaxTickets) {
+        Messages.sendMessage(state.player, "Ticket.MaxTickets", MaxTickets);
+        return;
+      }
+    }
 
         java.util.List<String> tickets = getTickets().getStringList("Tickets");
         String next_ticket = String.valueOf(tickets.isEmpty() ? 0 : Integer.parseInt(Ticket.load(getTickets(), tickets.get(tickets.size() - 1)).getId(), 10) + 1);
@@ -353,11 +342,14 @@ public class TakeaNumber extends JavaPlugin {
                     (int) state.player.getLocation().getZ());
         }
 
-        ticket.save();
-        saveTickets();
+    ticket.save();
+    saveTickets();
 
-        Messages.sendMessage(state.sender, "Command.Create.User", ticket.getId());
-        notifyAdmins(Messages.getString("Command.Create.Admin", (state.isConsole ? Messages.getString("General.ConsoleName") : state.name)));
+    Messages.sendMessage(state.sender, "Command.Create.User", ticket.getId());
+    notifyAdmins(
+      Messages.getString("Command.Create.Admin", (state.isConsole ? Messages.getString("General.ConsoleName") : state.name)),
+      state.player
+    );
     }
 
     /**
@@ -442,7 +434,7 @@ public class TakeaNumber extends JavaPlugin {
         }
 
         ticket.reply = "none";
-        ticket.resolve = "(" + (state.isConsole ? "Console " : state.name) + ") " + resolve.toString();
+    ticket.resolve = resolve.toString();
         ticket.resolved_on = TakeaNumber.getCurrentDate();
         ticket.save();
         saveTickets();
@@ -451,10 +443,10 @@ public class TakeaNumber extends JavaPlugin {
         if (state.isAdmin) {
             String admin = state.isConsole ? Messages.getString("General.ConsoleName") : state.name;
             Player target = getServer().getPlayer(ticket.placed_by);
-            if (target != null) {
+      if (target != null && target != state.player) {
                 Messages.sendMessage(target, "Command.Resolve.Admin", admin);
             }
-            notifyAdmins(Messages.getString("Command.Resolve.Admin", id, admin));
+      notifyAdmins(Messages.getString("Command.Resolve.Admin", id, admin), state.player);
         } else {
             notifyAdmins(Messages.getString("Command.Resolve.User", id, state.name));
         }
@@ -494,133 +486,142 @@ public class TakeaNumber extends JavaPlugin {
         }
     }
 
-    /**
-     * Teleport the player to the location from which a ticket was submitted
-     *
-     * @param state
-     * @param args
-     */
-    private void cmdVisit(State state, String[] args) {
-        if (state.isConsole) {
-            Messages.sendMessage(state.player, "Error.Command.NoConsole");
-            return;
-        }
-        if (!state.isAdmin) {
-            Messages.sendMessage(state.player, "Error.Command.AdminOnly");
-            return;
-        }
-        String id = args[0];
-        if (!isTicket(id)) {
-            Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id);
-            return;
-        }
+  /**
+   * Teleport the player to the location from which a ticket was submitted
+   *
+   * @param state
+   * @param args
+   */
+  private void cmdVisit(State state, String[] args) {
+    if (state.isConsole) {
+      Messages.sendMessage(state.player, "Error.Command.NoConsole");
+      return;
+    }
+    if (!state.isAdmin) {
+      Messages.sendMessage(state.player, "Error.Command.AdminOnly");
+      return;
+    }
+    String id = args[0];
+    if (!isTicket(id)) {
+      Messages.sendMessage(state.player, "Error.Ticket.InvalidNumber", id);
+      return;
+    }
+    Ticket ticket = Ticket.load(getTickets(), id);
+    if (ticket == null) {
+      Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id);
+      return;
+    }
+
+    if (state.player != null && !ticket.location.equals("none")) {
+      String[] vals = ticket.location.split(",");
+      World world = Bukkit.getWorld(vals[0]);
+      double x = Double.parseDouble(vals[1]);
+      double y = Double.parseDouble(vals[2]);
+      double z = Double.parseDouble(vals[3]);
+      state.player.teleport(new Location(world, x, y, z));
+    }
+  }
+
+  /**
+   * Add a ticket and increment the users ticket count
+   *
+   * @param id
+   * @param user
+   */
+  protected void newTicket(String id, String user) {
+    java.util.List<String> Tickets = getTickets().getStringList("Tickets");
+    Tickets.add(id);
+    getTickets().set("Tickets", Tickets);
+    getTickets().set("counts." + user, getTickets().getInt("counts." + user) + 1);
+  }
+  final static long DAY_IN_MS = 1000 * 60 * 60 * 24;
+
+  /**
+   * Delete tickets older than the expiration period.
+   */
+  protected void expireTickets() {
+    int days = getConfig().getInt("ResolvedTicketExpiration", 7);
+    if (days == 0) {
+      return;
+    }
+    Date expiration = new Date(System.currentTimeMillis() - (days * TakeaNumber.DAY_IN_MS));
+    java.util.List<String> Tickets = getTickets().getStringList("Tickets");
+    int count = 0;
+    log.log(Level.INFO, Messages.getString("Expire.Started"));
+    for (String id : Tickets) {
+      try {
         Ticket ticket = Ticket.load(getTickets(), id);
-        if (ticket == null) {
-            Messages.sendMessage(state.sender, "Error.Ticket.InvalidNumber", id);
-            return;
+        if (ticket.resolved_on != null) {
+          Date resolved_on = date_format.parse(ticket.resolved_on);
+          if (resolved_on.before(expiration)) {
+            deleteTicket(id);
+          }
         }
-
-        if (state.player != null && !ticket.location.equals("none")) {
-            String[] vals = ticket.location.split(",");
-            World world = Bukkit.getWorld(vals[0]);
-            double x = Double.parseDouble(vals[1]);
-            double y = Double.parseDouble(vals[2]);
-            double z = Double.parseDouble(vals[3]);
-            state.player.teleport(new Location(world, x, y, z));
-        }
+      } catch (ParseException e) {
+        log.log(Level.WARNING, Messages.getString("Error.Date.Parse", e.getLocalizedMessage()));
+      }
     }
+    log.log(Level.INFO, Messages.getString("Expire.Finished", count));
+  }
 
-    /**
-     * Add a ticket and increment the users ticket count
-     *
-     * @param id
-     * @param user
-     */
-    protected void newTicket(String id, String user) {
-        java.util.List<String> Tickets = getTickets().getStringList("Tickets");
-        Tickets.add(id);
-        getTickets().set("Tickets", Tickets);
-        getTickets().set("counts." + user, getTickets().getInt("counts." + user) + 1);
+  /**
+   * Remove the ticket from the list
+   *
+   * @param ticket
+   */
+  protected void deleteTicket(String ticket) {
+    // Decrement the users ticket count
+    String user = "counts." + Ticket.load(getTickets(), ticket).placed_by;
+    int count = getTickets().getInt(user) - 1;
+    getTickets().set(user, count < 1 ? null : count);
+
+    // Remove the ticket entry
+    java.util.List<String> Tickets = getTickets().getStringList("Tickets");
+    Tickets.remove(ticket);
+    getTickets().set("Tickets", Tickets);
+    getTickets().set(ticket, null);
+
+    // Save changes
+    saveTickets();
+  }
+  /**
+   * Format for tickets
+   */
+  private static java.util.regex.Pattern ticket_format = java.util.regex.Pattern.compile("^\\d+$", java.util.regex.Pattern.CASE_INSENSITIVE);
+
+  /**
+   * Checks to see if a string represents a ticket id
+   *
+   * @param str string to check
+   * @return true if the string matches the ticket format
+   */
+  protected boolean isTicket(String str) {
+    return ticket_format.matcher(str).matches();
+  }
+
+  /**
+   * Notify all online administrators
+   *
+   * @param message message to send
+   */
+  protected void notifyAdmins(String message) {
+    notifyAdmins(message, null);
+  }
+  
+  /**
+   * Notify all online administrators excluding the player
+   * @param message message to send
+   * @param player exclude this player from the notification
+   */
+  protected void notifyAdmins(String message, Player player) {
+    if (!getConfig().getBoolean("NotifyAdminOnTicketClose")) {
+      return;
     }
-    final static long DAY_IN_MS = 1000 * 60 * 60 * 24;
-
-    /**
-     * Delete tickets older than the expiration period.
-     */
-    protected void expireTickets() {
-        int days = getConfig().getInt("ResolvedTicketExpiration", 7);
-        if (days == 0) {
-            return;
-        }
-        Date expiration = new Date(System.currentTimeMillis() - (days * TakeaNumber.DAY_IN_MS));
-        java.util.List<String> Tickets = getTickets().getStringList("Tickets");
-        int count = 0;
-        log.log(Level.INFO, Messages.getString("Expire.Started"));
-        for (String id : Tickets) {
-            try {
-                Ticket ticket = Ticket.load(getTickets(), id);
-                if (ticket.resolved_on != null) {
-                    Date resolved_on = date_format.parse(ticket.resolved_on);
-                    if (resolved_on.before(expiration)) {
-                        deleteTicket(id);
-                    }
-                }
-            } catch (ParseException e) {
-                log.log(Level.WARNING, Messages.getString("Error.Date.Parse", e.getLocalizedMessage()));
-            }
-        }
-        log.log(Level.INFO, Messages.getString("Expire.Finished", count));
+    Player[] players = Bukkit.getOnlinePlayers();
+    for (Player op : players) {
+      if (op.hasPermission("tan.admin") && (player == null || op != player)) {
+        op.sendMessage(message);
+      }
     }
-
-    /**
-     * Remove the ticket from the list
-     *
-     * @param ticket
-     */
-    protected void deleteTicket(String ticket) {
-        // Decrement the users ticket count
-        String user = "counts." + Ticket.load(getTickets(), ticket).placed_by;
-        int count = getTickets().getInt(user) - 1;
-        getTickets().set(user, count < 1 ? null : count);
-
-        // Remove the ticket entry
-        java.util.List<String> Tickets = getTickets().getStringList("Tickets");
-        Tickets.remove(ticket);
-        getTickets().set("Tickets", Tickets);
-        getTickets().set(ticket, null);
-
-        // Save changes
-        saveTickets();
-    }
-    /**
-     * Format for tickets
-     */
-    private static java.util.regex.Pattern ticket_format = java.util.regex.Pattern.compile("^\\d+$", java.util.regex.Pattern.CASE_INSENSITIVE);
-
-    /**
-     * Checks to see if a string represents a ticket id
-     *
-     * @param str string to check
-     * @return true if the string matches the ticket format
-     */
-    protected boolean isTicket(String str) {
-        return ticket_format.matcher(str).matches();
-    }
-
-    /**
-     * Notify all online administrators
-     *
-     * @param message message to send
-     */
-    protected void notifyAdmins(String message) {
-        if (!getConfig().getBoolean("NotifyAdminOnTicketClose")) {
-            return;
-        }
-        Player[] players = Bukkit.getOnlinePlayers();
-        for (Player op : players) {
-            if (op.hasPermission("tan.admin")) {
-                op.sendMessage(message);
-            }
-        }
     }
 }
