@@ -10,7 +10,7 @@ Ticket:
   Heading     : '&6&l-- Ticket &7%1$s&6&l --'
   Location:
     Label     : ' Location: %1$s'
-    None      : 'None [Console Ticket]'
+    None      : " None [Console]"
   PlacedBy    : ' Placed By: %1$s'
   Reply       : ' Reply: %1$s'
   Resolve     : ' Resolve: %1$s'
