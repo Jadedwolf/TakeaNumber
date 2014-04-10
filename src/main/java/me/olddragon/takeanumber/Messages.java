@@ -65,7 +65,7 @@ public class Messages {
    * @return the message for the key with the arguments inserted or !key! if not found
    */
   public static String getString(String key, Object... args) {
-    return String.format(yaml.getString(key), args);
+    return String.format(getString(key), args);
   }
   
   /**
