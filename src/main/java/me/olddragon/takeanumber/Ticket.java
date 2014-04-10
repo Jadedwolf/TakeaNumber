@@ -29,43 +29,43 @@ public class Ticket {
       return null;
     }
     Ticket ticket = new Ticket(file, id);
-    ticket.description = file.getString(id + ".description"); //$NON-NLS-1$
-    ticket.dates = file.getString(id + ".dates"); //$NON-NLS-1$
-    ticket.placed_by = file.getString(id + ".placedby"); //$NON-NLS-1$
-    ticket.location = file.getString(id + ".location", "none"); //$NON-NLS-1$ //$NON-NLS-2$
-    ticket.reply = file.getString(id + ".reply", "none"); //$NON-NLS-1$ //$NON-NLS-2$
-    ticket.admin = file.getString(id + ".admin", "none"); //$NON-NLS-1$ //$NON-NLS-2$
-    ticket.resolve = file.getString(id + ".resolve", "none"); //$NON-NLS-1$ //$NON-NLS-2$
-    ticket.resolved_on = file.getString(id + ".resolved_on"); //$NON-NLS-1$
+    ticket.description = file.getString(id + ".description");
+    ticket.dates = file.getString(id + ".dates");
+    ticket.placed_by = file.getString(id + ".placedby");
+    ticket.location = file.getString(id + ".location", "none");
+    ticket.reply = file.getString(id + ".reply", "none");
+    ticket.admin = file.getString(id + ".admin", "none");
+    ticket.resolve = file.getString(id + ".resolve", "none");
+    ticket.resolved_on = file.getString(id + ".resolved_on");
     return ticket;
   }
 
   public void save() {
-    this.source.set(this.id + ".description", this.description); //$NON-NLS-1$
-    this.source.set(this.id + ".dates", this.dates); //$NON-NLS-1$
-    this.source.set(this.id + ".placedby", this.placed_by); //$NON-NLS-1$
-    this.source.set(this.id + ".location", this.location); //$NON-NLS-1$
-    this.source.set(this.id + ".reply", this.reply); //$NON-NLS-1$
-    this.source.set(this.id + ".admin", this.admin); //$NON-NLS-1$
-    this.source.set(this.id + ".resolve", this.resolve); //$NON-NLS-1$
-    this.source.set(this.id + ".resolved_on", this.resolved_on); //$NON-NLS-1$
+    this.source.set(this.id + ".description", this.description);
+    this.source.set(this.id + ".dates", this.dates);
+    this.source.set(this.id + ".placedby", this.placed_by);
+    this.source.set(this.id + ".location", this.location);
+    this.source.set(this.id + ".reply", this.reply);
+    this.source.set(this.id + ".admin", this.admin);
+    this.source.set(this.id + ".resolve", this.resolve);
+    this.source.set(this.id + ".resolved_on", this.resolved_on);
   }
 
   public void toMessage(CommandSender sender) {
-    Messages.sendMessage(sender, "Ticket.Heading", this.id); //$NON-NLS-1$
-    Messages.sendMessage(sender, "Ticket.Description", this.description); //$NON-NLS-1$
-    Messages.sendMessage(sender, "Ticket.Date", this.dates); //$NON-NLS-1$
-    Messages.sendMessage(sender, "Ticket.Location", (this.location.equalsIgnoreCase("none") ? Messages.getString("Ticket.Location.None") : this.location)); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    Messages.sendMessage(sender, "Ticket.PlacedBy", this.placed_by); //$NON-NLS-1$
-    Messages.sendMessage(sender, "Ticket.Assigned", this.admin); //$NON-NLS-1$
-    if (!this.reply.equals("none")) { //$NON-NLS-1$
-      Messages.sendMessage(sender, "Ticket.Reply", this.reply); //$NON-NLS-1$
+    Messages.sendMessage(sender, "Ticket.Heading", this.id);
+    Messages.sendMessage(sender, "Ticket.Description", this.description);
+    Messages.sendMessage(sender, "Ticket.Date", this.dates);
+    Messages.sendMessage(sender, this.location.equalsIgnoreCase("none") ? "Ticket.Location.None" : "Ticket.Location.Label", this.location);
+    Messages.sendMessage(sender, "Ticket.PlacedBy", this.placed_by);
+    Messages.sendMessage(sender, "Ticket.Assigned", this.admin);
+    if (!this.reply.equals("none")) {
+      Messages.sendMessage(sender, "Ticket.Reply", this.reply);
     }
-    if (!this.resolve.equals("none")) { //$NON-NLS-1$
-      Messages.sendMessage(sender, "Ticket.Resolve", this.resolve); //$NON-NLS-1$
+    if (!this.resolve.equals("none")) {
+      Messages.sendMessage(sender, "Ticket.Resolve", this.resolve);
     }
     if (this.resolved_on != null) {
-      Messages.sendMessage(sender, "Ticket.ResolvedOn", this.resolved_on); //$NON-NLS-1$
+      Messages.sendMessage(sender, "Ticket.ResolvedOn", this.resolved_on);
     }
   }
   
