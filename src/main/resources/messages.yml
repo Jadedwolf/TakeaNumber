@@ -19,11 +19,11 @@ Command:
   List:
     Heading  : '&9&l-- Current Help Tickets --'
     Empty    : '&4&o There are currently no help tickets to display.'
-    # %1 = id, %2 = description, %2 = dates, %3 = placed_by, %4 = location,
-    # %5 = reply, %6 = admin, %7 = resolve, %8 = resolved_on
-    Replied  : ' &7(&e%1$s&7)&9&o %3$s:&e %2$s @ %4$s'
-    Resolved : ' &7(&a%1$s&7)&9&o %3$s:&a %2$s @ %4$s'
-    Open     : ' &7(&c%1$s&7)&9&o %3$s:&c %2$s @ %4$s'
+    # %1 = id, %2 = description, %3 = dates, %4 = placed_by, %5 = location,
+    # %6 = reply, %7 = admin, %8 = resolve, %9 = resolved_on
+    Replied  : ' &7(&e%1$s&7)&9&o %4$s:&e %2$s @ %5$s'
+    Resolved : ' &7(&a%1$s&7)&9&o %4$s:&a %2$s @ %5$s'
+    Open     : ' &7(&c%1$s&7)&9&o %4$s:&c %2$s @ %5$s'
   Create:
     User     : '&aYour ticket (&c#%1$s&a) has been logged and will be reviewed shortly. Use &f&o/ticket-check&a to review the status in the future.' # %1 = Ticket ID
     Admin    : '&6*&7&o %1$s &rhas opened a ticket'                            # %1 = Player Name or Console
