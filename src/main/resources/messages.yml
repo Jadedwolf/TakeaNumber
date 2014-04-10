@@ -4,17 +4,17 @@ General:
   Disabled    : 'TakeaNumber disabled.'                        # %1 = Description, %2 = Version
   Login       : '&6&o*&7 There are currently &6%1$d &7&oopen Help Tickets' # %1 = Number of Tickets
 Ticket:
-  Assigned    : ' Assigned: %1$s'
-  Date        : ' Date: %1$s'
-  Description : ' Ticket: %1$s'
+  Assigned    : ' Assigned: &b&o%1$s'
+  Date        : ' Date: &b&o%1$s'
+  Description : ' Ticket: &7&o%1$s'
   Heading     : '&6&l-- Ticket &7%1$s&6&l --'
   Location:
-    Label     : ' Location: %1$s'
+    Label     : ' Location: &b&o%1$s'
     None      : " None [Console]"
-  PlacedBy    : ' Placed By: %1$s'
-  Reply       : ' Reply: %1$s'
-  Resolve     : ' Resolve: %1$s'
-  ResolvedOn  : ' Resolved On: %1$s'
+  PlacedBy    : ' Placed By: &b&o%1$s'
+  Reply       : ' Reply: &b&o%1$s'
+  Resolve     : ' Resolve: &b&o%1$s'
+  ResolvedOn  : ' Resolved On: &b&o%1$s'
 Command:
   List:
     Heading  : '&9&l-- Current Help Tickets --'
@@ -62,8 +62,8 @@ Command:
       Take    : '&9 /ticket-take    &7<#>           &f- Assign yourself to a ticket.'
       Visit   : '&9 /ticket-visit   &7<#>           &f- Teleport yourself to a ticket location.'
 Expire:
-  Started : '&4&l&nDeleting Expired Tickets'
-  Finished: '&4%1$d expired tickets were deleted.'     # %1 = Number of tickets deleted
+  Started : '&7&l&nDeleting Expired Tickets'
+  Finished: '&a%1$d &rexpired tickets were deleted.'     # %1 = Number of tickets deleted
 Error:
   Tickets:
     Save          : '&4Could not save tickets to&r %1$s'                                        # %1 = File name
