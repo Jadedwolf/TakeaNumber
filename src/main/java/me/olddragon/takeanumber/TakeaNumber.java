@@ -350,6 +350,7 @@ public class TakeaNumber extends JavaPlugin {
         if (state.isConsole) {
             newTicket(next_ticket, Messages.getString("General.ConsoleName"));
             ticket.placed_by = Messages.getString("General.ConsoleName");
+            ticket.location = Messages.getString("General.ConsoleName");
         } else {
             newTicket(next_ticket, state.player.getDisplayName());
             ticket.placed_by = state.player.getDisplayName();
