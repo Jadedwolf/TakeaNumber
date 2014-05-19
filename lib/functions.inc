@@ -22,6 +22,7 @@ function setHeaders($url) {
 }
 
 function processTicket($template, $ticket, $full) {
+  if (!isset($full["location"])   ) { $full["location"]    = "none"; }
   if (!isset($full["admin"])      ) { $full["admin"]       = "none"; }
   if (!isset($full["reply"])      ) { $full["reply"]       = "none"; }
   if (!isset($full["resolve"])    ) { $full["resolve"]     = "none"; }
