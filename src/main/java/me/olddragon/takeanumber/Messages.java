@@ -14,9 +14,6 @@ public class Messages {
 
     private static YamlConfiguration yaml;
 
-    private Messages() {
-    }
-
     /**
      * Loads messages from a YAML file.
      *
@@ -25,17 +22,6 @@ public class Messages {
     public static void load(File file) {
         if (file.exists() && file.canRead()) {
             yaml = YamlConfiguration.loadConfiguration(file);
-        }
-    }
-
-    /**
-     * Load the default messages if some or all are not customized.
-     *
-     * @param is input stream to load messages from.
-     */
-    public static void setDefaults(InputStream is) {
-        if (yaml != null && is != null) {
-            yaml.setDefaults(YamlConfiguration.loadConfiguration(is));
         }
     }
 

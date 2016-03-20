@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>me.olddragon.takeanumber</groupId>
     <artifactId>TakeaNumber</artifactId>
-    <version>0.8</version>
+    <version>0.9</version>
     <name>TakeaNumber</name>
     <url>http://jadedwolf.com/</url>
     <properties>
@@ -36,9 +36,7 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.7.9-R0.2-SNAPSHOT</version>
-            <type>jar</type>
-            <scope>compile</scope>
+            <version>1.7.9-R0.2</version>
         </dependency>
     </dependencies>
 </project>
